@@ -12,7 +12,8 @@ def getArguments():
     parser.add_argument('file_in')
     parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', required=True, help='Set member_of_campaign.')
     parser.add_argument('-p', '--pwg', action='store', dest='pwg', default='XXX', help='Set PWG. Defaults to %(default)s. Change default on this line to your PWG.')
-    parser.add_argument('-d', action='store_true', dest='useDev', help='Use dev/test instance.')
+    parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run on result. Does not add requests to McM.')
+    parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
     parser.add_argument('--version', action='version', version='%(prog)s v0.1')
     
     args_ = parser.parse_args()
@@ -140,10 +141,21 @@ def main():
             Eff.append(row[fields[9]])
         else:
             Eff.append(1.0)
-            
-
+    
+    if not args.doDryRun:
+        print "Adding %d requests to McM" % num_requests
+    else:
+        print "Dry run. %d requests will not be added to McM" % num_requests 
     for i in range(num_requests):
-        print i,DataSetName[i]
+        new_req = {'pwg':args.pwg,'member_of_campaign':args.campaign}
+        if not args.doDryRun:
+            answer = mcm.putA('requests', new_req)
+            if answer['results']:
+                print answer['prepid'],answer['dataset_name'],"created"
+            else:
+                print DataSetName[i]," failed to be created"
+        else:
+            print DataSetName[i],"not created"
     
 if __name__ == '__main__':
     main()
