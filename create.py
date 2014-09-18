@@ -85,6 +85,18 @@ def getFields(csvfile_,file_in_):
 
     return list
 
+def formatFragment(file_,campaign_):
+    if len(file_.split("/")) > 1:
+        return file_
+    elif campaign_ in ['Summer12']:
+        return "Configuration/GenProduction/python/EightTeV/"+file_
+    elif campaign_ in ['Fall13']:
+        return "Configuration/GenProduction/python/ThirteenTeV/"+file_
+    else:
+        print "Error: Cannot determine energy of campaign %s." % campaign_
+        print "Exiting with status 5."
+        sys.exit(5)
+
 def main():
     args = getArguments()
     checkPWG(args.pwg)
@@ -119,7 +131,7 @@ def main():
             MCDBID.append(-1)
         if fields[2] > -1: CS.append(row[fields[2]])
         if fields[3] > -1: Evts.append(row[fields[3]])
-        if fields[4] > -1: Frag.append(row[fields[4]])
+        if fields[4] > -1: Frag.append(formatFragment(row[fields[4]],args.campaign))
         if fields[5] > -1: Time.append(row[fields[5]])
         if fields[6] > -1: Size.append(row[fields[6]])
         if fields[7] > -1: Tag.append(row[fields[7]])
