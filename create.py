@@ -3,6 +3,8 @@ import sys
 import os.path
 import argparse
 import csv
+sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
+from rest import * # Load class to access McM
 
 def getArguments():
     parser = argparse.ArgumentParser(description='Create McM requests.')
@@ -90,6 +92,7 @@ def main():
     
     if args.useDev:
         print "Using dev/test instance."
+    mcm = restful( dev=args.useDev ) # Get McM connection
 
     csvfile = open(args.file_in,'r')
     fields = getFields(csvfile,args.file_in)
