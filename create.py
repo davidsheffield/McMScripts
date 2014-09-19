@@ -159,7 +159,7 @@ def main():
         if fields[5] > -1: Time.append(float(row[fields[5]]))
         if fields[6] > -1: Size.append(float(row[fields[6]]))
         if fields[7] > -1: Tag.append(row[fields[7]])
-        if fields[8] > -1: Gen.append(row[fields[8]])
+        if fields[8] > -1: Gen.append(row[fields[8]].split(" "))
         if fields[9] > -1:
             FiltEff.append(float(row[fields[9]]))
         else:
@@ -197,7 +197,7 @@ def main():
         if len(Time): new_req['time_event'] = Time[i]
         if len(Size): new_req['size_event'] = Size[i]
         if len(Tag): new_req['fragment_tag'] = Tag[i]
-        if len(Gen): new_req['generators'] = [Gen[i]]
+        if len(Gen): new_req['generators'] = Gen[i]
         
         if not args.doDryRun:
             answer = mcm.putA('requests', new_req)
