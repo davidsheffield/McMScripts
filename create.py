@@ -3,6 +3,7 @@ import sys
 import os.path
 import argparse
 import csv
+import pprint
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 
@@ -127,14 +128,14 @@ def main():
         num_requests += 1
         if fields[0] > -1: DataSetName.append(row[fields[0]])
         if fields[1] > -1:
-            MCDBID.append(row[fields[1]])
+            MCDBID.append(int(row[fields[1]]))
         else:
             MCDBID.append(-1)
-        if fields[2] > -1: CS.append(row[fields[2]])
-        if fields[3] > -1: Evts.append(row[fields[3]])
+        if fields[2] > -1: CS.append(float(row[fields[2]]))
+        if fields[3] > -1: Evts.append(int(row[fields[3]]))
         if fields[4] > -1: Frag.append(formatFragment(row[fields[4]],args.campaign))
-        if fields[5] > -1: Time.append(row[fields[5]])
-        if fields[6] > -1: Size.append(row[fields[6]])
+        if fields[5] > -1: Time.append(float(row[fields[5]]))
+        if fields[6] > -1: Size.append(float(row[fields[6]]))
         if fields[7] > -1: Tag.append(row[fields[7]])
         if fields[8] > -1: Gen.append(row[fields[8]])
         if fields[9] > -1:
@@ -148,14 +149,27 @@ def main():
         print "Dry run. %d requests will not be added to McM" % num_requests 
     for i in range(num_requests):
         new_req = {'pwg':args.pwg,'member_of_campaign':args.campaign}
+        if len(DataSetName): new_req['dataset_name'] = DataSetName[i]
+        if len(MCDBID): new_req['mcdb_id'] = MCDBID[i]
+        if len(CS): new_req['generator_parameters'] = [{'cross_section':CS[i]}]
+        if len(Evts): new_req['total_events'] = Evts[i]
+        if len(Frag): new_req['name_of_fragment'] = Frag[i]
+        if len(Time): new_req['time_event'] = Time[i]
+        if len(Size): new_req['size_event'] = Size[i]
+        if len(Tag): new_req['fragment_tag'] = Tag[i]
+        if len(Gen): new_req['generators'] = [Gen[i]]
+        if len(Eff): new_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
+
         if not args.doDryRun:
             answer = mcm.putA('requests', new_req)
             if answer['results']:
+                pprint.pprint(answer)
                 print answer['prepid'],answer['dataset_name'],"created"
             else:
                 print DataSetName[i]," failed to be created"
         else:
             print DataSetName[i],"not created"
+            pprint.pprint(new_req)
     
 if __name__ == '__main__':
     main()
