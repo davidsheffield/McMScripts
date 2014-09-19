@@ -76,10 +76,18 @@ def getFields(csvfile_,file_in_):
         elif field in ['Generator','generator']:
             if list[8] > -1: exitDuplicateField(file_in_,"Generator")
             list[8] = ind
-        elif field in ['Efficiency','efficiency']:
-            if list[9] > -1: exitDuplicateField(file_in_,"Efficiency")
+        elif field in ['Filter Efficiency','Filter efficiency','filter efficiency']:
+            if list[9] > -1: exitDuplicateField(file_in_,"Filter Efficiency")
             list[9] = ind
-            list[9] += 1
+        elif field in ['Filter Efficiency Error','Filter efficiency error','filter efficiency error']:
+            if list[10] > -1: exitDuplicateField(file_in_,"Filter Efficiency Error")
+            list[10] = ind
+        elif field in ['Match Efficiency','Match efficiency','match efficiency']:
+            if list[11] > -1: exitDuplicateField(file_in_,"Match Efficiency")
+            list[11] = ind
+        elif field in ['Match Efficiency Error','Match efficiency error','match efficiency error']:
+            if list[12] > -1: exitDuplicateField(file_in_,"Match Efficiency Error")
+            list[12] = ind
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
@@ -151,20 +159,33 @@ def main():
         new_req = {'pwg':args.pwg,'member_of_campaign':args.campaign}
         if len(DataSetName): new_req['dataset_name'] = DataSetName[i]
         if len(MCDBID): new_req['mcdb_id'] = MCDBID[i]
-        if len(CS): new_req['generator_parameters'] = [{'cross_section':CS[i]}]
+        #if len(CS): new_req['generator_parameters'] = [{'cross_section':CS[i]}]
         if len(Evts): new_req['total_events'] = Evts[i]
         if len(Frag): new_req['name_of_fragment'] = Frag[i]
         if len(Time): new_req['time_event'] = Time[i]
         if len(Size): new_req['size_event'] = Size[i]
         if len(Tag): new_req['fragment_tag'] = Tag[i]
         if len(Gen): new_req['generators'] = [Gen[i]]
-        if len(Eff): new_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
+        #if len(Eff): new_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
 
         if not args.doDryRun:
             answer = mcm.putA('requests', new_req)
             if answer['results']:
                 pprint.pprint(answer)
-                print answer['prepid'],answer['dataset_name'],"created"
+                mod_req = mcm.getA('requests',answer['prepid'])
+                # Add generator parameters
+                if len(CS):
+                    mod_req['generator_parameters'][0]['cross_section'] = CS[i]
+                if len(Eff):
+                    mod_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
+#        a_clone['generator_parameters'][0]['filter_efficiency_error'] = 0.0
+#        a_clone['generator_parameters'][0]['match_efficiency'] = 1.0
+#        a_clone['generator_parameters'][0]['match_efficiency_error'] = 0.0
+                    update_answer = mcm.updateA('requests',mod_req) # Update request with generator parameters
+                    if update_answer['results']:
+                        print answer['prepid'],"created"
+                    else:
+                        print answer['prepid'],"created but generator parameters not set"
             else:
                 print DataSetName[i]," failed to be created"
         else:
