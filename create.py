@@ -46,7 +46,7 @@ def exitDuplicateField(file_in_,field_):
     sys.exit(3)
 
 def getFields(csvfile_,file_in_):
-    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name','Dataset Name','Dataset','dataset']:
@@ -88,6 +88,12 @@ def getFields(csvfile_,file_in_):
         elif field in ['Match Efficiency Error','Match efficiency error','match efficiency error']:
             if list[12] > -1: exitDuplicateField(file_in_,"Match Efficiency Error")
             list[12] = ind
+        elif field in ['PWG','pwg']:
+            if list[13] > -1: exitDuplicateField(file_in_,"PWG")
+            list[13] = ind
+        elif field in ['Campaign','campaign','Member of Campaign','Member of campaign','member of campaign']:
+            if list[14] > -1: exitDuplicateField(file_in_,"Member of Campaign")
+            list[14] = ind
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
@@ -129,7 +135,12 @@ def main():
     Size=[]        # Size per event [kB]
     Tag=[]         # Fragment tag
     Gen=[]         # Generators
-    Eff=[]         # Efficiency
+    FiltEff=[]     # Filter efficiency
+    FiltEffErr=[]  # Filter efficiency error
+    MatchEff=[]    # Match efficiency
+    MatchEffErr=[] # Match efficiency error
+    PWG=[]         # PWG
+    Camp=[]        # Member of campaign
 
     num_requests = 0
     for row in csv.reader(csvfile):
@@ -139,7 +150,10 @@ def main():
             MCDBID.append(int(row[fields[1]]))
         else:
             MCDBID.append(-1)
-        if fields[2] > -1: CS.append(float(row[fields[2]]))
+        if fields[2] > -1:
+            CS.append(float(row[fields[2]]))
+        else:
+            CS.append(1.0)
         if fields[3] > -1: Evts.append(int(row[fields[3]]))
         if fields[4] > -1: Frag.append(formatFragment(row[fields[4]],args.campaign))
         if fields[5] > -1: Time.append(float(row[fields[5]]))
@@ -147,45 +161,60 @@ def main():
         if fields[7] > -1: Tag.append(row[fields[7]])
         if fields[8] > -1: Gen.append(row[fields[8]])
         if fields[9] > -1:
-            Eff.append(row[fields[9]])
+            FiltEff.append(float(row[fields[9]]))
         else:
-            Eff.append(1.0)
+            FiltEff.append(1.0)
+        if fields[10] > -1:
+            FiltEffErr.append(float(row[fields[10]]))
+        else:
+            FiltEffErr.append(0.0)
+        if fields[11] > -1:
+            MatchEff.append(float(row[fields[11]]))
+        else:
+            MatchEff.append(1.0)
+        if fields[12] > -1:
+            MatchEffErr.append(float(row[fields[12]]))
+        else:
+            MatchEffErr.append(0.0)
+        if fields[13] > -1:
+            PWG.append(row[fields[13]])
+        else:
+            PWG.append(args.pwg)
+        if fields[14] > -1:
+            Camp.append(row[fields[14]])
+        else:
+            Camp.append(args.campaign)
     
     if not args.doDryRun:
         print "Adding %d requests to McM" % num_requests
     else:
         print "Dry run. %d requests will not be added to McM" % num_requests 
     for i in range(num_requests):
-        new_req = {'pwg':args.pwg,'member_of_campaign':args.campaign}
+        new_req = {'pwg':PWG[i],'member_of_campaign':Camp[i],'mcdb_id':MCDBID[i]}
         if len(DataSetName): new_req['dataset_name'] = DataSetName[i]
-        if len(MCDBID): new_req['mcdb_id'] = MCDBID[i]
-        #if len(CS): new_req['generator_parameters'] = [{'cross_section':CS[i]}]
         if len(Evts): new_req['total_events'] = Evts[i]
         if len(Frag): new_req['name_of_fragment'] = Frag[i]
         if len(Time): new_req['time_event'] = Time[i]
         if len(Size): new_req['size_event'] = Size[i]
         if len(Tag): new_req['fragment_tag'] = Tag[i]
         if len(Gen): new_req['generators'] = [Gen[i]]
-        #if len(Eff): new_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
-
+        
         if not args.doDryRun:
             answer = mcm.putA('requests', new_req)
             if answer['results']:
                 pprint.pprint(answer)
                 mod_req = mcm.getA('requests',answer['prepid'])
                 # Add generator parameters
-                if len(CS):
-                    mod_req['generator_parameters'][0]['cross_section'] = CS[i]
-                if len(Eff):
-                    mod_req['generator_parameters'][0]['filter_efficiency'] = Eff[i]
-#        a_clone['generator_parameters'][0]['filter_efficiency_error'] = 0.0
-#        a_clone['generator_parameters'][0]['match_efficiency'] = 1.0
-#        a_clone['generator_parameters'][0]['match_efficiency_error'] = 0.0
-                    update_answer = mcm.updateA('requests',mod_req) # Update request with generator parameters
-                    if update_answer['results']:
-                        print answer['prepid'],"created"
-                    else:
-                        print answer['prepid'],"created but generator parameters not set"
+                mod_req['generator_parameters'][0]['cross_section'] = CS[i]
+                mod_req['generator_parameters'][0]['filter_efficiency'] = FiltEff[i]
+                mod_req['generator_parameters'][0]['filter_efficiency_error'] = FiltEffErr[i]
+                mod_req['generator_parameters'][0]['match_efficiency'] = MatchEff[i]
+                mod_req['generator_parameters'][0]['match_efficiency_error'] = MatchEffErr[i]
+                update_answer = mcm.updateA('requests',mod_req) # Update request with generator parameters
+                if update_answer['results']:
+                    print answer['prepid'],"created"
+                else:
+                    print answer['prepid'],"created but generator parameters not set"
             else:
                 print DataSetName[i]," failed to be created"
         else:
