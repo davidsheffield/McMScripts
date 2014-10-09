@@ -8,11 +8,13 @@ sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 
 def getArguments():
+    defaultPWG = 'XXX'
+
     parser = argparse.ArgumentParser(description='Create McM requests.')
 
     parser.add_argument('file_in')
     parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', required=True, help='Set member_of_campaign.')
-    parser.add_argument('-p', '--pwg', action='store', dest='pwg', default='XXX', help='Set PWG. Defaults to %(default)s. Change default on this line to your PWG.')
+    parser.add_argument('-p', '--pwg', action='store', dest='pwg', default=defaultPWG, help='Set PWG. Defaults to %(default)s. Change the variable defaultPWG to your PWG.')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run on result. Does not add requests to McM.')
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
     parser.add_argument('--version', action='version', version='%(prog)s v0.1')
