@@ -57,10 +57,10 @@ def getFields(csvfile_,file_in_):
         elif field in ['EOS','eos','Eos','MCDBID','mcdbid']:
             if list[1] > -1: exitDuplicateField(file_in_,"EOS")
             list[1] = ind
-        elif field in ['Cross section','Cross section [pb]','Cross section (pb)','CS','CS [pb]','CS (pb)','Xsec','Xsec [pb]','Xsec (pb)']:
+        elif field in ['Cross section','Cross section [pb]','Cross section (pb)','Cross Section','Cross Section [pb]','Cross Section (pb)','CS','CS [pb]','CS (pb)','Xsec','Xsec [pb]','Xsec (pb)']:
             if list[2] > -1: exitDuplicateField(file_in_,"Cross Section")
             list[2] = ind
-        elif field in ['Total Events','Total events','Events','events','total events']:
+        elif field in ['Total Events','Total events','Events','events','total events','Number of Events']:
             if list[3] > -1: exitDuplicateField(file_in_,"Total Events")
             list[3] = ind
         elif field in ['Fragment name','Fragment Name','Generator fragment name','Generator Fragment Name','Fragment','fragment']:
