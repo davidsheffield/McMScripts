@@ -6,6 +6,7 @@ import csv
 import pprint
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
+from requestClass import *
 
 def getArguments():
     defaultPWG = 'XXX'
@@ -127,79 +128,66 @@ def main():
     csvfile = open(args.file_in,'r')
     fields = getFields(csvfile,args.file_in)
     
-    # Initialize lists
-    DataSetName=[] # Sample names
-    MCDBID=[]      # LHE file
-    CS=[]          # Cross section [pb]
-    Evts=[]        # Number of events
-    Frag=[]        # Fragment name
-    Time=[]        # Time per event [s]
-    Size=[]        # Size per event [kB]
-    Tag=[]         # Fragment tag
-    Gen=[]         # Generators
-    FiltEff=[]     # Filter efficiency
-    FiltEffErr=[]  # Filter efficiency error
-    MatchEff=[]    # Match efficiency
-    MatchEffErr=[] # Match efficiency error
-    PWG=[]         # PWG
-    Camp=[]        # Member of campaign
+    requests = []
 
     num_requests = 0
     for row in csv.reader(csvfile):
         num_requests += 1
-        if fields[0] > -1: DataSetName.append(row[fields[0]])
+        tmpReq = Request()
+        if fields[0] > -1: tmpReq.setDataSetName(row[fields[0]])
         if fields[1] > -1:
-            MCDBID.append(int(row[fields[1]]))
+            tmpReq.setMCDBID(row[fields[1]])
         else:
-            MCDBID.append(-1)
+            tmpReq.setMCDBID(-1)
         if fields[2] > -1:
-            CS.append(float(row[fields[2]]))
+            tmpReq.setCS(row[fields[2]])
         else:
-            CS.append(1.0)
-        if fields[3] > -1: Evts.append(int(row[fields[3]]))
-        if fields[4] > -1: Frag.append(formatFragment(row[fields[4]],args.campaign))
-        if fields[5] > -1: Time.append(float(row[fields[5]]))
-        if fields[6] > -1: Size.append(float(row[fields[6]]))
-        if fields[7] > -1: Tag.append(row[fields[7]])
-        if fields[8] > -1: Gen.append(row[fields[8]].split(" "))
+            tmpReq.setCS(1.0)
+        if fields[3] > -1: tmpReq.setEvts(row[fields[3]])
+        if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],args.campaign))
+        if fields[5] > -1: tmpReq.setTime(row[fields[5]])
+        if fields[6] > -1: tmpReq.setSize(row[fields[6]])
+        if fields[7] > -1: tmpReq.setTag(row[fields[7]])
+        if fields[8] > -1: tmpReq.setGen(row[fields[8]].split(" "))
         if fields[9] > -1:
-            FiltEff.append(float(row[fields[9]]))
+            tmpReq.setFiltEff(row[fields[9]])
         else:
-            FiltEff.append(1.0)
+            tmpReq.setFiltEff(1.0)
         if fields[10] > -1:
-            FiltEffErr.append(float(row[fields[10]]))
+            tmpReq.setFiltEffErr(row[fields[10]])
         else:
-            FiltEffErr.append(0.0)
+            tmpReq.setFiltEffErr(0.0)
         if fields[11] > -1:
-            MatchEff.append(float(row[fields[11]]))
+            tmpReq.setMatchEff(row[fields[11]])
         else:
-            MatchEff.append(1.0)
+            tmpReq.setMatchEff(1.0)
         if fields[12] > -1:
-            MatchEffErr.append(float(row[fields[12]]))
+            tmpReq.setMatchEffEr(row[fields[12]])
         else:
-            MatchEffErr.append(0.0)
+            tmpReq.setMatchEffErr(0.0)
         if fields[13] > -1:
-            PWG.append(row[fields[13]])
+            tmpReq.setPWG(row[fields[13]])
         else:
-            PWG.append(args.pwg)
+            tmpReq.setPWG(args.pwg)
         if fields[14] > -1:
-            Camp.append(row[fields[14]])
+            tmpReq.setCamp(row[fields[14]])
         else:
-            Camp.append(args.campaign)
+            tmpReq.setCamp(args.campaign)
+        requests.append(tmpReq)
     
     if not args.doDryRun:
         print "Adding %d requests to McM" % num_requests
     else:
         print "Dry run. %d requests will not be added to McM" % num_requests 
-    for i in range(num_requests):
-        new_req = {'pwg':PWG[i],'member_of_campaign':Camp[i],'mcdb_id':MCDBID[i]}
-        if len(DataSetName): new_req['dataset_name'] = DataSetName[i]
-        if len(Evts): new_req['total_events'] = Evts[i]
-        if len(Frag): new_req['name_of_fragment'] = Frag[i]
-        if len(Time): new_req['time_event'] = Time[i]
-        if len(Size): new_req['size_event'] = Size[i]
-        if len(Tag): new_req['fragment_tag'] = Tag[i]
-        if len(Gen): new_req['generators'] = Gen[i]
+    for reqFields in requests:
+        new_req = {'pwg':reqFields.getPWG(),'member_of_campaign':reqFields.getCamp(),'mcdb_id':reqFields.getMCDBID()}
+        if reqFields.useDataSetName(): new_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useEvts(): new_req['total_events'] = reqFields.getEvts()
+        if reqFields.useFrag(): new_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTime(): new_req['time_event'] = reqFields.getTime()
+        if reqFields.useSize(): new_req['size_event'] = reqFields.getSize()
+        if reqFields.useTag(): new_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useGen(): new_req['generators'] = reqFields.getGen()
         
         if not args.doDryRun:
             answer = mcm.putA('requests', new_req)
@@ -207,20 +195,20 @@ def main():
                 pprint.pprint(answer)
                 mod_req = mcm.getA('requests',answer['prepid'])
                 # Add generator parameters
-                mod_req['generator_parameters'][0]['cross_section'] = CS[i]
-                mod_req['generator_parameters'][0]['filter_efficiency'] = FiltEff[i]
-                mod_req['generator_parameters'][0]['filter_efficiency_error'] = FiltEffErr[i]
-                mod_req['generator_parameters'][0]['match_efficiency'] = MatchEff[i]
-                mod_req['generator_parameters'][0]['match_efficiency_error'] = MatchEffErr[i]
+                mod_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
+                mod_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getreqFields.getFiltEff()
+                mod_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
+                mod_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
+                mod_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
                 update_answer = mcm.updateA('requests',mod_req) # Update request with generator parameters
                 if update_answer['results']:
                     print answer['prepid'],"created"
                 else:
                     print answer['prepid'],"created but generator parameters not set"
             else:
-                print DataSetName[i]," failed to be created"
+                print reqFields.getDataSetName()," failed to be created"
         else:
-            print DataSetName[i],"not created"
+            print reqFields.getDataSetName(),"not created"
             pprint.pprint(new_req)
     
 if __name__ == '__main__':
