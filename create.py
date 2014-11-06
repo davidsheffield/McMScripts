@@ -116,20 +116,8 @@ def formatFragment(file_,campaign_):
         print "Exiting with status 5."
         sys.exit(5)
 
-def main():
-    args = getArguments()
-    checkPWG(args.pwg)
-    checkFile(args.file_in)
-    
-    if args.useDev:
-        print "Using dev/test instance."
-    mcm = restful( dev=args.useDev ) # Get McM connection
-
-    csvfile = open(args.file_in,'r')
-    fields = getFields(csvfile,args.file_in)
-    
+def fillFields(csvfile, fields, campaign, PWG):
     requests = []
-
     num_requests = 0
     for row in csv.reader(csvfile):
         num_requests += 1
@@ -144,7 +132,7 @@ def main():
         else:
             tmpReq.setCS(1.0)
         if fields[3] > -1: tmpReq.setEvts(row[fields[3]])
-        if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],args.campaign))
+        if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
         if fields[5] > -1: tmpReq.setTime(row[fields[5]])
         if fields[6] > -1: tmpReq.setSize(row[fields[6]])
         if fields[7] > -1: tmpReq.setTag(row[fields[7]])
@@ -168,14 +156,16 @@ def main():
         if fields[13] > -1:
             tmpReq.setPWG(row[fields[13]])
         else:
-            tmpReq.setPWG(args.pwg)
+            tmpReq.setPWG(PWG)
         if fields[14] > -1:
             tmpReq.setCamp(row[fields[14]])
         else:
-            tmpReq.setCamp(args.campaign)
+            tmpReq.setCamp(campaign)
         requests.append(tmpReq)
-    
-    if not args.doDryRun:
+    return requests, num_requests
+
+def createRequests(requests, num_requests, doDryRun):
+    if not doDryRun:
         print "Adding %d requests to McM" % num_requests
     else:
         print "Dry run. %d requests will not be added to McM" % num_requests 
@@ -189,7 +179,7 @@ def main():
         if reqFields.useTag(): new_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useGen(): new_req['generators'] = reqFields.getGen()
         
-        if not args.doDryRun:
+        if not doDryRun:
             answer = mcm.putA('requests', new_req)
             if answer['results']:
                 pprint.pprint(answer)
@@ -210,6 +200,22 @@ def main():
         else:
             print reqFields.getDataSetName(),"not created"
             pprint.pprint(new_req)
+
+def main():
+    args = getArguments()
+    checkPWG(args.pwg)
+    checkFile(args.file_in)
+    
+    if args.useDev:
+        print "Using dev/test instance."
+    mcm = restful( dev=args.useDev ) # Get McM connection
+
+    csvfile = open(args.file_in,'r')
+    fields = getFields(csvfile,args.file_in)
+    
+    requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg)
+    
+    createRequests(requests, num_requests, args.doDryRun)
     
 if __name__ == '__main__':
     main()
