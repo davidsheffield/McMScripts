@@ -16,6 +16,7 @@ def getArguments():
     parser.add_argument('file_in')
     parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', required=True, help='Set member_of_campaign.')
     parser.add_argument('-p', '--pwg', action='store', dest='pwg', default=defaultPWG, help='Set PWG. Defaults to %(default)s. Change the variable defaultPWG to your PWG.')
+    parser.add_argument('-m', '--modify', action='store_true', dest='doModify', help='Modify existing requests. The CSV file must contain the PrepIds of the requests to modify.')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run on result. Does not add requests to McM.')
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
     parser.add_argument('--version', action='version', version='%(prog)s v0.1')
@@ -49,7 +50,7 @@ def exitDuplicateField(file_in_,field_):
     sys.exit(3)
 
 def getFields(csvfile_,file_in_):
-    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name','Dataset Name','Dataset','dataset']:
@@ -97,6 +98,9 @@ def getFields(csvfile_,file_in_):
         elif field in ['Campaign','campaign','Member of Campaign','Member of campaign','member of campaign']:
             if list[14] > -1: exitDuplicateField(file_in_,"Member of Campaign")
             list[14] = ind
+        elif field in ['PrepId','PrepID','PREPID','prepid']:
+            if list[15] > -1: exitDuplicateField(file_in_,"PrepId")
+            list[15] = ind
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
@@ -214,8 +218,11 @@ def main():
     fields = getFields(csvfile,args.file_in)
     
     requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg)
-    
-    createRequests(requests, num_requests, args.doDryRun, args.useDev)
+
+    if args.doModify:
+        print "modify"
+    else:
+        createRequests(requests, num_requests, args.doDryRun, args.useDev)
     
 if __name__ == '__main__':
     main()
