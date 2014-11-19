@@ -188,7 +188,7 @@ def createRequests(requests, num_requests, doDryRun, useDev):
                 mod_req = mcm.getA('requests',answer['prepid'])
                 # Add generator parameters
                 mod_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
-                mod_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getreqFields.getFiltEff()
+                mod_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getFiltEff()
                 mod_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
                 mod_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
                 mod_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
