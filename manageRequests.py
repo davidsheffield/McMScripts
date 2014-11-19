@@ -184,7 +184,6 @@ def createRequests(requests, num_requests, doDryRun, useDev):
         if not doDryRun:
             answer = mcm.putA('requests', new_req)
             if answer['results']:
-                pprint.pprint(answer)
                 mod_req = mcm.getA('requests',answer['prepid'])
                 # Add generator parameters
                 mod_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
