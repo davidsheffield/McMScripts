@@ -164,7 +164,9 @@ def fillFields(csvfile, fields, campaign, PWG):
         requests.append(tmpReq)
     return requests, num_requests
 
-def createRequests(requests, num_requests, doDryRun):
+def createRequests(requests, num_requests, doDryRun, useDev):
+    mcm = restful( dev=useDev ) # Get McM connection
+
     if not doDryRun:
         print "Adding %d requests to McM" % num_requests
     else:
@@ -208,14 +210,13 @@ def main():
     
     if args.useDev:
         print "Using dev/test instance."
-    mcm = restful( dev=args.useDev ) # Get McM connection
 
     csvfile = open(args.file_in,'r')
     fields = getFields(csvfile,args.file_in)
     
     requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg)
     
-    createRequests(requests, num_requests, args.doDryRun)
+    createRequests(requests, num_requests, args.doDryRun, args.useDev)
     
 if __name__ == '__main__':
     main()
