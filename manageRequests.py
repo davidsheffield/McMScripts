@@ -165,6 +165,8 @@ def fillFields(csvfile, fields, campaign, PWG):
             tmpReq.setCamp(row[fields[14]])
         else:
             tmpReq.setCamp(campaign)
+        if fields[15] > -1:
+            tmpReq.setPrepId(row[fields[15]])
         requests.append(tmpReq)
     return requests, num_requests
 

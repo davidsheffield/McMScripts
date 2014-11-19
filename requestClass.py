@@ -17,6 +17,7 @@ class Request:
         self.useMatchEffErr_ = False
         self.usePWG_         = False
         self.useCamp_        = False
+        self.usePrepId_      = False
 
     def setDataSetName(self,x):
         self.DataSetName_ = x
@@ -63,6 +64,9 @@ class Request:
     def setCamp(self,x):
         self.Camp_ = x
         self.useCamp_ = True
+    def setPrepId(self,x):
+        self.PrepId_ = x
+        self.usePrepId_ = True
 
     def getDataSetName(self):
         return self.DataSetName_
@@ -94,6 +98,8 @@ class Request:
         return self.PWG_
     def getCamp(self):
         return self.Camp_
+    def getPrepId(self):
+        return self.PrepId_
     
     def useDataSetName(self):
         return self.useDataSetName_
@@ -125,3 +131,5 @@ class Request:
         return self.usePWG_
     def useCamp(self):
         return self.useCamp_
+    def usePrepId(self):
+        return self.usePrepId_
