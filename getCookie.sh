@@ -1,0 +1,1 @@
+/afs/cern.ch/cms/PPD/PdmV/tools/McM/getCookie.sh
