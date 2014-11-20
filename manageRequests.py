@@ -10,7 +10,6 @@ from requestClass import *
 
 def getArguments():
     defaultPWG = 'XXX'
-    defaultPWG = 'EXO'
 
     parser = argparse.ArgumentParser(description='Create McM requests.')
 
@@ -18,6 +17,7 @@ def getArguments():
     parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', help='Set member_of_campaign.')
     parser.add_argument('-p', '--pwg', action='store', dest='pwg', default=defaultPWG, help='Set PWG. Defaults to %(default)s. Change the variable defaultPWG to your PWG.')
     parser.add_argument('-m', '--modify', action='store_true', dest='doModify', help='Modify existing requests. The CSV file must contain the PrepIds of the requests to modify.')
+    parser.add_argument('--clone', action='store', dest='cloneId', default='', help='Clone request.')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run on result. Does not add requests to McM.')
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
     parser.add_argument('--version', action='version', version='%(prog)s v0.1')
@@ -44,6 +44,15 @@ def checkPWG(pwg_):
         sys.stdout.write("\n")
         print "Exiting with status 2."
         sys.exit(2)
+
+def checkNotCreate(doModify_,cloneId_):
+    doClone = False
+    if cloneId_ != "": doClone = True
+    if doModify_ and doClone:
+        print "Error: cannot both --modify and --clone."
+        print "Exiting with status 6."
+        sys.exit(6)
+    return doModify_ or doClone
 
 def exitDuplicateField(file_in_,field_):
     print "Error: File %s contains multiple instances of the field %s" % (file_in_,field_)
@@ -121,7 +130,7 @@ def formatFragment(file_,campaign_):
         print "Exiting with status 5."
         sys.exit(5)
 
-def fillFields(csvfile, fields, campaign, PWG, doModify):
+def fillFields(csvfile, fields, campaign, PWG, notCreate_):
     requests = []
     num_requests = 0
     for row in csv.reader(csvfile):
@@ -130,11 +139,11 @@ def fillFields(csvfile, fields, campaign, PWG, doModify):
         if fields[0] > -1: tmpReq.setDataSetName(row[fields[0]])
         if fields[1] > -1:
             tmpReq.setMCDBID(row[fields[1]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setMCDBID(-1)
         if fields[2] > -1:
             tmpReq.setCS(row[fields[2]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setCS(1.0)
         if fields[3] > -1: tmpReq.setEvts(row[fields[3]])
         if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
@@ -144,27 +153,27 @@ def fillFields(csvfile, fields, campaign, PWG, doModify):
         if fields[8] > -1: tmpReq.setGen(row[fields[8]].split(" "))
         if fields[9] > -1:
             tmpReq.setFiltEff(row[fields[9]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setFiltEff(1.0)
         if fields[10] > -1:
             tmpReq.setFiltEffErr(row[fields[10]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setFiltEffErr(0.0)
         if fields[11] > -1:
             tmpReq.setMatchEff(row[fields[11]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setMatchEff(1.0)
         if fields[12] > -1:
             tmpReq.setMatchEffErr(row[fields[12]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setMatchEffErr(0.0)
         if fields[13] > -1:
             tmpReq.setPWG(row[fields[13]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setPWG(PWG)
         if fields[14] > -1:
             tmpReq.setCamp(row[fields[14]])
-        elif not doModify:
+        elif not notCreate_:
             tmpReq.setCamp(campaign)
         if fields[15] > -1:
             tmpReq.setPrepId(row[fields[15]])
@@ -226,8 +235,8 @@ def modifyRequests(requests, num_requests, doDryRun, useDev):
             continue
         
         mod_req = mcm.getA('requests',reqFields.getPrepId())
-        if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useDataSetName(): mod_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
         if reqFields.useTime(): mod_req['time_event'] = reqFields.getTime()
@@ -251,9 +260,45 @@ def modifyRequests(requests, num_requests, doDryRun, useDev):
             print reqFields.getPrepId(),"not modified"
             pprint.pprint(mod_req)
 
+def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
+    mcm = restful( dev=useDev ) # Get McM connection
+
+    if not doDryRun:
+        print "Adding %d requests to McM with clone" % num_requests
+    else:
+        print "Dry run. %d requests will not be add with clone to McM" % num_requests
+    for reqFields in requests:
+        clone_req = mcm.getA('requests',cloneId_)
+        if reqFields.useDataSetName(): clone_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useMCDBID(): clone_req['mcdb_id'] = reqFields.getMCDBID()
+        if reqFields.useEvts(): clone_req['total_events'] = reqFields.getEvts()
+        if reqFields.useFrag(): clone_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTime(): clone_req['time_event'] = reqFields.getTime()
+        if reqFields.useSize(): clone_req['size_event'] = reqFields.getSize()
+        if reqFields.useTag(): clone_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useGen(): clone_req['generators'] = reqFields.getGen()
+        if reqFields.useCS(): clone_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
+        if reqFields.useFiltEff(): clone_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getFiltEff()
+        if reqFields.useFiltEffErr(): clone_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
+        if reqFields.useMatchEff(): clone_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
+        if reqFields.useMatchEffErr(): clone_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
+
+        if not doDryRun:
+            answer = mcm.clone(cloneId_,clone_req) # Clone request
+            pprint.pprint(answer)
+            if answer['results']:
+                newId = answer['prepid']
+                print newId,"created with clone"
+            else:
+                print reqFields.getDataSetName(),"failed to be created with clone"
+        else:
+            print reqFields.getDataSetName(),"not created with clone"
+            pprint.pprint(clone_req)
+
 def main():
     args = getArguments()
     checkPWG(args.pwg)
+    notCreate = checkNotCreate(args.doModify,args.cloneId)
     checkFile(args.file_in)
     
     if args.useDev:
@@ -262,10 +307,12 @@ def main():
     csvfile = open(args.file_in,'r')
     fields = getFields(csvfile,args.file_in)
     
-    requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg, args.doModify)
+    requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg, notCreate)
 
     if args.doModify:
         modifyRequests(requests, num_requests, args.doDryRun, args.useDev)
+    elif args.cloneId != "":
+        cloneRequests(requests, num_requests, args.doDryRun, args.useDev, args.cloneId)
     else:
         createRequests(requests, num_requests, args.doDryRun, args.useDev)
     
