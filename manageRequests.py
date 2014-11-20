@@ -10,11 +10,12 @@ from requestClass import *
 
 def getArguments():
     defaultPWG = 'XXX'
+    defaultPWG = 'EXO'
 
     parser = argparse.ArgumentParser(description='Create McM requests.')
 
     parser.add_argument('file_in')
-    parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', required=True, help='Set member_of_campaign.')
+    parser.add_argument('-c', '--campaign', action='store', dest='campaign', metavar='name', help='Set member_of_campaign.')
     parser.add_argument('-p', '--pwg', action='store', dest='pwg', default=defaultPWG, help='Set PWG. Defaults to %(default)s. Change the variable defaultPWG to your PWG.')
     parser.add_argument('-m', '--modify', action='store_true', dest='doModify', help='Modify existing requests. The CSV file must contain the PrepIds of the requests to modify.')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run on result. Does not add requests to McM.')
@@ -120,7 +121,7 @@ def formatFragment(file_,campaign_):
         print "Exiting with status 5."
         sys.exit(5)
 
-def fillFields(csvfile, fields, campaign, PWG):
+def fillFields(csvfile, fields, campaign, PWG, doModify):
     requests = []
     num_requests = 0
     for row in csv.reader(csvfile):
@@ -129,11 +130,11 @@ def fillFields(csvfile, fields, campaign, PWG):
         if fields[0] > -1: tmpReq.setDataSetName(row[fields[0]])
         if fields[1] > -1:
             tmpReq.setMCDBID(row[fields[1]])
-        else:
+        elif not doModify:
             tmpReq.setMCDBID(-1)
         if fields[2] > -1:
             tmpReq.setCS(row[fields[2]])
-        else:
+        elif not doModify:
             tmpReq.setCS(1.0)
         if fields[3] > -1: tmpReq.setEvts(row[fields[3]])
         if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
@@ -143,27 +144,27 @@ def fillFields(csvfile, fields, campaign, PWG):
         if fields[8] > -1: tmpReq.setGen(row[fields[8]].split(" "))
         if fields[9] > -1:
             tmpReq.setFiltEff(row[fields[9]])
-        else:
+        elif not doModify:
             tmpReq.setFiltEff(1.0)
         if fields[10] > -1:
             tmpReq.setFiltEffErr(row[fields[10]])
-        else:
+        elif not doModify:
             tmpReq.setFiltEffErr(0.0)
         if fields[11] > -1:
             tmpReq.setMatchEff(row[fields[11]])
-        else:
+        elif not doModify:
             tmpReq.setMatchEff(1.0)
         if fields[12] > -1:
-            tmpReq.setMatchEffEr(row[fields[12]])
-        else:
+            tmpReq.setMatchEffErr(row[fields[12]])
+        elif not doModify:
             tmpReq.setMatchEffErr(0.0)
         if fields[13] > -1:
             tmpReq.setPWG(row[fields[13]])
-        else:
+        elif not doModify:
             tmpReq.setPWG(PWG)
         if fields[14] > -1:
             tmpReq.setCamp(row[fields[14]])
-        else:
+        elif not doModify:
             tmpReq.setCamp(campaign)
         if fields[15] > -1:
             tmpReq.setPrepId(row[fields[15]])
@@ -178,6 +179,10 @@ def createRequests(requests, num_requests, doDryRun, useDev):
     else:
         print "Dry run. %d requests will not be added to McM" % num_requests 
     for reqFields in requests:
+        if not reqFields.useCamp():
+            print "Campaign is missing."
+            continue
+
         new_req = {'pwg':reqFields.getPWG(),'member_of_campaign':reqFields.getCamp(),'mcdb_id':reqFields.getMCDBID()}
         if reqFields.useDataSetName(): new_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useEvts(): new_req['total_events'] = reqFields.getEvts()
@@ -203,10 +208,48 @@ def createRequests(requests, num_requests, doDryRun, useDev):
                 else:
                     print answer['prepid'],"created but generator parameters not set"
             else:
-                print reqFields.getDataSetName()," failed to be created"
+                print reqFields.getDataSetName(),"failed to be created"
         else:
             print reqFields.getDataSetName(),"not created"
             pprint.pprint(new_req)
+
+def modifyRequests(requests, num_requests, doDryRun, useDev):
+    mcm = restful( dev=useDev ) # Get McM connection
+
+    if not doDryRun:
+        print "Modifying %d requests to McM" % num_requests
+    else:
+        print "Dry run. %d requests will not be modified in McM" % num_requests
+    for reqFields in requests:
+        if not reqFields.usePrepId():
+            print "PrepId is missing."
+            continue
+        
+        mod_req = mcm.getA('requests',reqFields.getPrepId())
+        if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
+        if reqFields.useDataSetName(): mod_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
+        if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTime(): mod_req['time_event'] = reqFields.getTime()
+        if reqFields.useSize(): mod_req['size_event'] = reqFields.getSize()
+        if reqFields.useTag(): mod_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useGen(): mod_req['generators'] = reqFields.getGen()
+        if reqFields.useCS(): mod_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
+        if reqFields.useFiltEff(): mod_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getFiltEff()
+        if reqFields.useFiltEffErr(): mod_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
+        if reqFields.useMatchEff(): mod_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
+        if reqFields.useMatchEffErr(): mod_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
+
+        if not doDryRun:
+            answer = mcm.updateA('requests',mod_req) # Update request
+            pprint.pprint(answer)
+            if answer['results']:
+                print reqFields.getPrepId(),"modified"
+            else:
+                print reqFields.getPrepId(),"failed to be modified"
+        else:
+            print reqFields.getPrepId(),"not modified"
+            pprint.pprint(mod_req)
 
 def main():
     args = getArguments()
@@ -219,10 +262,10 @@ def main():
     csvfile = open(args.file_in,'r')
     fields = getFields(csvfile,args.file_in)
     
-    requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg)
+    requests, num_requests = fillFields(csvfile, fields, args.campaign, args.pwg, args.doModify)
 
     if args.doModify:
-        print "modify"
+        modifyRequests(requests, num_requests, args.doDryRun, args.useDev)
     else:
         createRequests(requests, num_requests, args.doDryRun, args.useDev)
     
