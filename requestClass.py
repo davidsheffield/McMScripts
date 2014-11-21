@@ -1,3 +1,11 @@
+################################
+#
+# requestClass.py
+#
+#  author: David G. Sheffield (Rutgers)
+#
+################################
+
 class Request:
     """Class to store request information"""
     def __init__(self):
