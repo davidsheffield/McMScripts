@@ -15,17 +15,31 @@ for the production instance of McM. If you would like to test with the dev/test 
 
 `cern-get-sso-cookie -u https://cms-pdmv-dev.cern.ch/mcm/ -o ~/private/cookie.txt --krb --reprocess`
 
-Then setup your CMSSW runtime environment before proceeding.
+If these to not work, try to run getCookie.sh. Only setup your CMSSW runtime environment after getting a cookie.
 
 ## Setup PWG
 
-The default PWG in create.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 11. Alternatively, you can include the `-p your_PWG`.
+The default PWG in create.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 23. Alternatively, you can include the flag `-p your_PWG`.
 
 ## Creating new requests
 
 To create new requests from a CSV file, execute the command
 
-`python create.py -c name_of_campaign input.csv`
+`python manageRequests.py -c name_of_campaign input.csv`
+
+If you would like to create new requests by cloning an existing request, execute the command
+
+`python manageRequests.py --clone PrepId_of_request_to_clone input.csv`
+
+Unless the flags `--clone` or `--modify` or `-m` are used, the script will use the CSV file to create new requests from scratch.
+
+## Modifying existing requests
+
+To modify an existing request, execute the command
+
+`python manageRequests.py -m input.csv`
+
+The CSV file must contain the PrepIds of the requests to modify.
 
 ## CSV file
 
@@ -45,12 +59,15 @@ Information for requests is provided in a CSV file. The script reads the first l
 * Match efficiency error
 * PWG
 * Campaign
+* PrepId
 
 It will also recognize some alternative names. If there is a field title that the script does not recognize, it will complain.
 
 To add multiple generators per requests, separate them with a space.
 
 The campaign and PWG can also be given for all requests with the flags `-c` and `-p`, respectively. If the PWG is neither given in the command line nor the CSV file, it will take its default value.
+
+The field PrepId is only used in modifying requests, where it is required.
 
 ## Dry run
 
