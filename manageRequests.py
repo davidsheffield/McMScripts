@@ -163,6 +163,11 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
         elif not notCreate_:
             tmpReq.setCS(1.0)
         if fields[3] > -1: tmpReq.setEvts(row[fields[3]])
+        if fields[14] > -1:
+            campaign = row[fields[14]]
+            tmpReq.setCamp(campaign)
+        elif not notCreate_:
+            tmpReq.setCamp(campaign)
         if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
         if fields[5] > -1: tmpReq.setTime(row[fields[5]])
         if fields[6] > -1: tmpReq.setSize(row[fields[6]])
@@ -188,10 +193,6 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
             tmpReq.setPWG(row[fields[13]])
         elif not notCreate_:
             tmpReq.setPWG(PWG)
-        if fields[14] > -1:
-            tmpReq.setCamp(row[fields[14]])
-        elif not notCreate_:
-            tmpReq.setCamp(campaign)
         if fields[15] > -1:
             tmpReq.setPrepId(row[fields[15]])
         requests.append(tmpReq)
