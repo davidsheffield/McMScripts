@@ -5,15 +5,15 @@ Author: David G. Sheffield (Rutgers)
 
 Scripts for creating and updating requests in McM. See https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVMcMScript for more information on scripts.
 
-# Usage
+# Usage of manageRequests.py
 
 Begin by getting a CERN SSO cookie with
 
-`cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/cookie.txt --krb --reprocess`
+`cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb --reprocess`
 
 for the production instance of McM. If you would like to test with the dev/test instance, run
 
-`cern-get-sso-cookie -u https://cms-pdmv-dev.cern.ch/mcm/ -o ~/private/cookie.txt --krb --reprocess`
+`cern-get-sso-cookie -u https://cms-pdmv-dev.cern.ch/mcm/ -o ~/private/dev-cookie.txt --krb --reprocess`
 
 If these to not work, try to run getCookie.sh. Only setup your CMSSW runtime environment after getting a cookie.
 
@@ -72,3 +72,13 @@ The field PrepId is only used in modifying requests, where it is required.
 ## Dry run
 
 The input.csv file can be tested with a dry run using the flag `-d`. Additionally, you can submit to the dev/test instance of McM using the flag `--dev`.
+
+# Usage of getTimeSize.sh
+
+After running
+
+`cmsrun -e -j log.xml test_cfg.py`
+
+to measure the time and size of a request, you can extract the time per event and calculate the size per event in kilobytes by running
+
+`sh getTimeSize.sh log.xml`
