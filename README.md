@@ -19,7 +19,7 @@ If these to not work, try to run getCookie.sh. Only setup your CMSSW runtime env
 
 ## Setup PWG
 
-The default PWG in create.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 23. Alternatively, you can include the flag `-p your_PWG`.
+The default PWG in manageRequests.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 23. Alternatively, you can include the flag `-p your_PWG`.
 
 ## Creating new requests
 
