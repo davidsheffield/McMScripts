@@ -140,7 +140,7 @@ def formatFragment(file_,campaign_):
         return file_
     elif campaign_ in ['Summer12']: # 8TeV
         return "Configuration/GenProduction/python/EightTeV/"+file_
-    elif campaign_ in ['Fall13','RunIIFall14GS']: # 13 TeV
+    elif campaign_ in ['Fall13','RunIIFall14GS','RunIIWinter15GS']: # 13 TeV
         return "Configuration/GenProduction/python/ThirteenTeV/"+file_
     else:
         print "Error: Cannot determine energy of campaign %s." % campaign_
