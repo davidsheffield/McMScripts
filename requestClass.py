@@ -10,22 +10,23 @@ class Request:
     """Class to store request information"""
     def __init__(self):
         """Initialize request with all fields set to false"""
-        self.useDataSetName_ = False
-        self.useMCDBID_      = False
-        self.useCS_          = False
-        self.useEvts_        = False
-        self.useFrag_        = False
-        self.useTime_        = False
-        self.useSize_        = False
-        self.useTag_         = False
-        self.useGen_         = False
-        self.useFiltEff_     = False
-        self.useFiltEffErr_  = False
-        self.useMatchEff_    = False
-        self.useMatchEffErr_ = False
-        self.usePWG_         = False
-        self.useCamp_        = False
-        self.usePrepId_      = False
+        self.useDataSetName_        = False
+        self.useMCDBID_             = False
+        self.useCS_                 = False
+        self.useEvts_               = False
+        self.useFrag_               = False
+        self.useTime_               = False
+        self.useSize_               = False
+        self.useTag_                = False
+        self.useGen_                = False
+        self.useFiltEff_            = False
+        self.useFiltEffErr_         = False
+        self.useMatchEff_           = False
+        self.useMatchEffErr_        = False
+        self.usePWG_                = False
+        self.useCamp_               = False
+        self.usePrepId_             = False
+        self.useSequencesCustomise_ = False
 
     def setDataSetName(self,x):
         self.DataSetName_ = x
@@ -75,6 +76,9 @@ class Request:
     def setPrepId(self,x):
         self.PrepId_ = x
         self.usePrepId_ = True
+    def setSequencesCustomise(self,x):
+        self.SequencesCustomise_ = x
+        self.useSequencesCustomise_ = True
 
     def getDataSetName(self):
         return self.DataSetName_
@@ -108,6 +112,8 @@ class Request:
         return self.Camp_
     def getPrepId(self):
         return self.PrepId_
+    def getSequencesCustomise(self):
+        return self.SequencesCustomise_
     
     def useDataSetName(self):
         return self.useDataSetName_
@@ -141,3 +147,5 @@ class Request:
         return self.useCamp_
     def usePrepId(self):
         return self.usePrepId_
+    def useSequencesCustomise(self):
+        return self.useSequencesCustomise_
