@@ -27,6 +27,7 @@ class Request:
         self.useCamp_               = False
         self.usePrepId_             = False
         self.useSequencesCustomise_ = False
+        self.useProcessString_      = False
 
     def setDataSetName(self,x):
         self.DataSetName_ = x
@@ -79,6 +80,9 @@ class Request:
     def setSequencesCustomise(self,x):
         self.SequencesCustomise_ = x
         self.useSequencesCustomise_ = True
+    def setProcessString(self,x):
+        self.ProcessString_ = x
+        self.useProcessString_ = True
 
     def getDataSetName(self):
         return self.DataSetName_
@@ -114,6 +118,8 @@ class Request:
         return self.PrepId_
     def getSequencesCustomise(self):
         return self.SequencesCustomise_
+    def getProcessString(self):
+        return self.ProcessString_
     
     def useDataSetName(self):
         return self.useDataSetName_
@@ -149,3 +155,5 @@ class Request:
         return self.usePrepId_
     def useSequencesCustomise(self):
         return self.useSequencesCustomise_
+    def useProcessString(self):
+        return self.useProcessString_

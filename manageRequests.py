@@ -76,7 +76,7 @@ def exitDuplicateField(file_in_,field_):
 
 def getFields(csvfile_,file_in_):
     # List of indices for each field in CSV file
-    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name','Dataset Name','Dataset','dataset']:
@@ -131,6 +131,9 @@ def getFields(csvfile_,file_in_):
         elif field in ['Sequences customise','Sequences customize']:
             if list[16] > -1: exitDuplicateField(file_in_,"Sequences customise")
             list[16] = ind
+        elif field in ['Process string','Process String']:
+            if list[17] > -1: exitDuplicateField(file_in_,"Process string")
+            list[17] = ind
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
@@ -200,6 +203,8 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
             tmpReq.setPrepId(row[fields[15]])
         if fields[16] > -1:
             tmpReq.setSequencesCustomise(row[fields[16]])
+        if fields[17] > -1:
+            tmpReq.setProcessString(row[fields[17]])
         requests.append(tmpReq)
     return requests, num_requests
 
@@ -228,6 +233,7 @@ def createRequests(requests, num_requests, doDryRun, useDev):
         if reqFields.useGen(): new_req['generators'] = reqFields.getGen()
         # Sequences might need to be added below with generator parameters
         if reqFields.useSequencesCustomise(): new_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
+        if reqField.useProcessString(): new_req['process_string'] = reqFields.getProcessString()
         
         if not doDryRun:
             answer = mcm.putA('requests', new_req) # Create request
@@ -287,6 +293,7 @@ def modifyRequests(requests, num_requests, doDryRun, useDev):
         if reqFields.useMatchEff(): mod_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
         if reqFields.useMatchEffErr(): mod_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
         if reqFields.useSequencesCustomise(): mod_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
+        if reqField.useProcessString(): new_req['process_string'] = reqFields.getProcessString()
 
         if not doDryRun:
             answer = mcm.updateA('requests',mod_req) # Update request
@@ -321,7 +328,8 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if reqFields.useFiltEffErr(): clone_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
         if reqFields.useMatchEff(): clone_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
         if reqFields.useMatchEffErr(): clone_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
-        if reqFields.useSequencesCustomise(): mod_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()        
+        if reqFields.useSequencesCustomise(): mod_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
+        if reqField.useProcessString(): new_req['process_string'] = reqFields.getProcessString()
 
         if not doDryRun:
             answer = mcm.clone(cloneId_,clone_req) # Clone request
