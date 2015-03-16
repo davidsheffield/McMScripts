@@ -37,4 +37,10 @@ echo "Getting test script for ${prepid} from McM."
 curl --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/${prepid} -o ${outputFile}
 
 sed -i '/grep/d' ${outputFile}
-echo "sh getTimeSize.sh ${1}_rt.xml" >> ${outputFile}
+echo "sh getTimeSize.sh ${prepid}_rt.xml" >> ${outputFile}
+
+#numberFromFile=`sed -n 's/.*-n \(.*\) ||.*/\1/p' ${outputFile}`
+if [ $number -gt 0 ]; then
+    sed -i "s/-n .* ||/-n ${number} ||/" ${outputFile}
+    sed -i "s/echo .* events were ran/echo ${number} events were run/" ${outputFile}
+fi
