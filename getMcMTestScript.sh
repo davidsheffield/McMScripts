@@ -35,9 +35,17 @@ echo "Getting test script for ${prepid} from McM."
 curl --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_test/${prepid} -o ${outputFile}
 
 sed -i '/grep/d' ${outputFile}
-echo "sh getTimeSize.sh ${prepid}_rt.xml" >> ${outputFile}
+echo "n=\`grep "\""TotalEvents"\"" ${prepid}_rt.xml | awk 'BEGIN{FS="\"">"\""}{print \$2}' | awk 'BEGIN{FS="\""<"\""}{print \$1}'\`
+echo "\""Events:       "\""\$n
 
-#numberFromFile=`sed -n 's/.*-n \(.*\) ||.*/\1/p' ${outputFile}`
+time=\`grep "\""AvgEventCPU"\"" ${prepid}_rt.xml | awk 'BEGIN{FS="\""\\"\"\""}{print \$4}'\`
+echo "\""CPU Time [s]: "\""\$time
+
+total_size=\`grep "\""Timing-tstoragefile-write-totalMegabytes"\"" ${prepid}_rt.xml | awk 'BEGIN{FS="\""\\"\"\""}{print \$4}'\`
+avg_size=\`echo "\""\$total_size*1024/\$n"\"" | bc -l\` # Convert total size to kilobytes and calculate average per event
+echo "\""Size [kB]:    "\""\$avg_size
+" >> ${outputFile}
+
 if [ $number -gt 0 ]; then
     sed -i "s/-n .* ||/-n ${number} ||/" ${outputFile}
     sed -i "s/echo .* events were ran/echo ${number} events were run/" ${outputFile}
