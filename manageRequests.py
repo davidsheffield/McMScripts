@@ -32,7 +32,7 @@ def getArguments():
     parser.add_argument('--clone', action='store', dest='cloneId', default='', help='Clone an existing request by giving its PrepId')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run of result. Does not add requests to McM.')
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s v0.1')
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.0')
     
     args_ = parser.parse_args()
     return args_
