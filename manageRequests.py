@@ -32,6 +32,7 @@ def getArguments():
     parser.add_argument('--clone', action='store', dest='cloneId', default='', help='Clone an existing request by giving its PrepId')
     parser.add_argument('-d', '--dry', action='store_true', dest='doDryRun', help='Dry run of result. Does not add requests to McM.')
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
+    parser.add_argument('-l', '--lhe', action='store_true', dest='isLHErequest', help='Check dataset when modifying requests. Fail and do not modify name if they conflict. Use for updating GS requests chained to wmLHE and pLHE requests.')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.0')
     
     args_ = parser.parse_args()
@@ -264,7 +265,7 @@ def createRequests(requests, num_requests, doDryRun, useDev):
                 print "request not created"
             pprint.pprint(new_req)
 
-def modifyRequests(requests, num_requests, doDryRun, useDev):
+def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
     # Modify existing request based on PrepId
     mcm = restful( dev=useDev ) # Get McM connection
 
@@ -279,7 +280,13 @@ def modifyRequests(requests, num_requests, doDryRun, useDev):
         
         # Get request from McM
         mod_req = mcm.getA('requests',reqFields.getPrepId())
-        if reqFields.useDataSetName(): mod_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useDataSetName():
+            if isLHErequest:
+                if mod_req['dataset_name'] != reqFields.getDataSetName():
+                    print reqFields.getPrepId(),"modification failed. Dataset name does not match McM."
+                    continue
+            else:
+                mod_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
@@ -365,7 +372,7 @@ def main():
 
     if args.doModify:
         # Modify existing requests
-        modifyRequests(requests, num_requests, args.doDryRun, args.useDev)
+        modifyRequests(requests, num_requests, args.doDryRun, args.useDev, args.isLHErequest)
     elif args.cloneId != "":
         # Create new requests using clone
         cloneRequests(requests, num_requests, args.doDryRun, args.useDev, args.cloneId)
