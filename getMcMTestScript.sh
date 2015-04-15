@@ -10,8 +10,7 @@
 #
 ################################
 
-prepid=$1
-shift
+prepid=""
 outputFile="test.sh"
 number=0
 while [ "$1" != "" ]; do
@@ -22,12 +21,11 @@ while [ "$1" != "" ]; do
 	-n) shift
 	    number=$1
 	    ;;
-	-h | --help) echo "Usage: sh getMcMTestScript.sh PrepID [-o outputFile] [-n number_of_events]"
+	-h | --help) echo "Usage: sh getMcMTestScript.sh PrepID [-o outputFile] [-n numberOfEvents]"
 	    exit
 	    ;;
-	*) echo "Bad arguments. Usage:"
-	    echo " sh getMcMTestScript.sh PrepID [-o outputFile] [-n number_of_events]"
-	    exit 1
+	*) prepid=$1
+	    ;;
     esac
     shift
 done
