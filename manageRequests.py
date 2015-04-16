@@ -294,6 +294,8 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         if reqFields.useSize(): mod_req['size_event'] = reqFields.getSize()
         if reqFields.useTag(): mod_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useGen(): mod_req['generators'] = reqFields.getGen()
+        if (reqFields.useCS() or reqFields.useFiltEff() or reqFields.useFiltEffErr() or reqFields.useMatchEff() or reqFields.useMatchEffErr()) and mod_req['generator_parameters'] == []:
+            mod_req['generator_parameters'] = [{'match_efficiency_error': 0.0, 'match_efficiency': 1.0, 'filter_efficiency': 1.0, 'version': 0, 'cross_section': 1.0, 'filter_efficiency_error': 0.0}]
         if reqFields.useCS(): mod_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
         if reqFields.useFiltEff(): mod_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getFiltEff()
         if reqFields.useFiltEffErr(): mod_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
