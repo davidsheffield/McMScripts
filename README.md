@@ -73,6 +73,14 @@ The field PrepId is only used in modifying requests, where it is required.
 
 The input.csv file can be tested with a dry run using the flag `-d`. Additionally, you can submit to the dev/test instance of McM using the flag `--dev`.
 
+# Usage of validateChains.py
+
+To validate multiple chained requests in McM run the command
+
+`python validateChains.py firstPrepID lastPrepID`
+
+The script will tell McM to validate all requests with PrepIDs within that range.
+
 # Usage of getMcMTestScript.sh
 
 The command
