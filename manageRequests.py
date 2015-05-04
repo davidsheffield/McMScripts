@@ -163,18 +163,21 @@ def formatFragment(file_,campaign_):
         sys.exit(5)
 
 def createLHEProducer(gridpack, cards):
-    code = "import FWCore.ParameterSet.Config as cms
+    code = """import FWCore.ParameterSet.Config as cms
 
-# link to cards:
-# %s
-
-externalLHEProducer = cms.EDProducer(\"ExternalLHEProducer\",
+externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring('%s'),
     nEvents = cms.untracked.uint32(5000),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
-)" % (cards, gridpack)
+)""" % (gridpack)
+
+    if cards != "":
+        code += """
+# Link to cards:
+# %s
+""" % (cards)
     return code
 
 def fillFields(csvfile, fields, campaign, PWG, notCreate_):
@@ -235,7 +238,6 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
                                                     row[fields[19]]))
             else:
                 tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], ""))
-        if fields[19] > -1:
         requests.append(tmpReq)
     return requests, num_requests
 
@@ -258,14 +260,15 @@ def createRequests(requests, num_requests, doDryRun, useDev):
         if reqFields.useDataSetName(): new_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useEvts(): new_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): new_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTag(): new_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useMcMFrag(): new_req['fragment'] = reqFields.getMcMFrag()
         if reqFields.useTime(): new_req['time_event'] = reqFields.getTime()
         if reqFields.useSize(): new_req['size_event'] = reqFields.getSize()
-        if reqFields.useTag(): new_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useGen(): new_req['generators'] = reqFields.getGen()
         # Sequences might need to be added below with generator parameters
         if reqFields.useSequencesCustomise(): new_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
         if reqFields.useProcessString(): new_req['process_string'] = reqFields.getProcessString()
-        
+
         if not doDryRun:
             answer = mcm.putA('requests', new_req) # Create request
             if answer['results']:
@@ -320,9 +323,10 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTag(): mod_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useMcMFrag(): new_req['fragment'] = reqFields.getMcMFrag()
         if reqFields.useTime(): mod_req['time_event'] = reqFields.getTime()
         if reqFields.useSize(): mod_req['size_event'] = reqFields.getSize()
-        if reqFields.useTag(): mod_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useGen(): mod_req['generators'] = reqFields.getGen()
         if (reqFields.useCS() or reqFields.useFiltEff() or reqFields.useFiltEffErr() or reqFields.useMatchEff() or reqFields.useMatchEffErr()) and mod_req['generator_parameters'] == []:
             mod_req['generator_parameters'] = [{'match_efficiency_error': 0.0, 'match_efficiency': 1.0, 'filter_efficiency': 1.0, 'version': 0, 'cross_section': 1.0, 'filter_efficiency_error': 0.0}]
@@ -358,9 +362,10 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if reqFields.useMCDBID(): clone_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): clone_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): clone_req['name_of_fragment'] = reqFields.getFrag()
+        if reqFields.useTag(): clone_req['fragment_tag'] = reqFields.getTag()
+        if reqFields.useMcMFrag(): new_req['fragment'] = reqFields.getMcMFrag()
         if reqFields.useTime(): clone_req['time_event'] = reqFields.getTime()
         if reqFields.useSize(): clone_req['size_event'] = reqFields.getSize()
-        if reqFields.useTag(): clone_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useGen(): clone_req['generators'] = reqFields.getGen()
         if reqFields.useCS(): clone_req['generator_parameters'][0]['cross_section'] = reqFields.getCS()
         if reqFields.useFiltEff(): clone_req['generator_parameters'][0]['filter_efficiency'] = reqFields.getFiltEff()
