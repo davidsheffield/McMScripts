@@ -60,6 +60,10 @@ Information for requests is provided in a CSV file. The script reads the first l
 * PWG
 * Campaign
 * PrepId
+* Sequences customise
+* Process string
+* Gridpack location
+* Gridpack cards URL
 
 It will also recognize some alternative names. If there is a field title that the script does not recognize, it will complain.
 
