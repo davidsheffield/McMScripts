@@ -39,7 +39,7 @@ To modify an existing request, execute the command
 
 `python manageRequests.py -m input.csv`
 
-The CSV file must contain the PrepIds of the requests to modify.
+The CSV file must contain the PrepIds of the requests to modify. If the CSV file contains dataset names, adding the flag `-l` will only modify the request if the request's dataset name matches that in the CSV file.
 
 ## CSV file
 
@@ -72,6 +72,14 @@ The field PrepId is only used in modifying requests, where it is required.
 ## Dry run
 
 The input.csv file can be tested with a dry run using the flag `-d`. Additionally, you can submit to the dev/test instance of McM using the flag `--dev`.
+
+# Usage of getMcMTestScript.sh
+
+The command
+
+`sh getMcMTestScript PrepID`
+
+will get the request's test script from McM and store it in test.sh. Run `sh test.sh` to execute the test locally. The output file can be modified by the flag `-o` and the number of events can be modified using the flag `-n`.
 
 # Usage of getTimeSize.sh
 
