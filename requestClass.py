@@ -15,6 +15,7 @@ class Request:
         self.useCS_                 = False
         self.useEvts_               = False
         self.useFrag_               = False
+        self.useMcMFrag_            = False
         self.useTime_               = False
         self.useSize_               = False
         self.useTag_                = False
@@ -44,6 +45,9 @@ class Request:
     def setFrag(self,x):
         self.Frag_ = x
         self.useFrag_ = True
+    def setMcMFrag(self,x):
+        self.McMFrag_ = x
+        self.useMcMFrag_ = True
     def setTime(self,x):
         self.Time_ = float(x)
         self.useTime_ = True
@@ -94,6 +98,8 @@ class Request:
         return self.Evts_
     def getFrag(self):
         return self.Frag_
+    def getMcMFrag(self):
+        return self.McMFrag_
     def getTime(self):
         return self.Time_
     def getSize(self):
@@ -120,7 +126,7 @@ class Request:
         return self.SequencesCustomise_
     def getProcessString(self):
         return self.ProcessString_
-    
+
     def useDataSetName(self):
         return self.useDataSetName_
     def useMCDBID(self):
@@ -131,6 +137,8 @@ class Request:
         return self.useEvts_
     def useFrag(self):
         return self.useFrag_
+    def useMcMFrag(self):
+        return self.useMcMFrag_
     def useTime(self):
         return self.useTime_
     def useSize(self):

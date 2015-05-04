@@ -77,7 +77,8 @@ def exitDuplicateField(file_in_,field_):
 
 def getFields(csvfile_,file_in_):
     # List of indices for each field in CSV file
-    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+             -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name','Dataset Name','Dataset','dataset']:
@@ -135,6 +136,13 @@ def getFields(csvfile_,file_in_):
         elif field in ['Process string','Process String']:
             if list[17] > -1: exitDuplicateField(file_in_,"Process string")
             list[17] = ind
+        elif field in ['Gridpack location', 'Gridpack']:
+            if list[18] > -1: exitDuplicateField(file_in_,"Gridpack location")
+            list[18] = ind
+        elif field in ['Gridpack cards URL', 'Cards URL',
+                       'Gridpack cards location', 'Cards location']:
+            if list[19] > -1: exitDuplicateField(file_in_,"Gridpack cards URL")
+            list[19] = ind
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
@@ -153,6 +161,21 @@ def formatFragment(file_,campaign_):
         print "Error: Cannot determine energy of campaign %s." % campaign_
         print "Exiting with status 5."
         sys.exit(5)
+
+def createLHEProducer(gridpack, cards):
+    code = "import FWCore.ParameterSet.Config as cms
+
+# link to cards:
+# %s
+
+externalLHEProducer = cms.EDProducer(\"ExternalLHEProducer\",
+    args = cms.vstring('%s'),
+    nEvents = cms.untracked.uint32(5000),
+    numberOfParameters = cms.uint32(1),
+    outputFile = cms.string('cmsgrid_final.lhe'),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
+)" % (cards, gridpack)
+    return code
 
 def fillFields(csvfile, fields, campaign, PWG, notCreate_):
     requests = [] # List containing request objects
@@ -206,6 +229,13 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
             tmpReq.setSequencesCustomise(row[fields[16]])
         if fields[17] > -1:
             tmpReq.setProcessString(row[fields[17]])
+        if fields[18] > -1:
+            if fields[19] > -1:
+                tmpReq.setMcMFrag(createLHEProducer(row[fields[18]],
+                                                    row[fields[19]]))
+            else:
+                tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], ""))
+        if fields[19] > -1:
         requests.append(tmpReq)
     return requests, num_requests
 
