@@ -27,6 +27,7 @@ def getArguments():
     parser.add_argument('-f', '--file', dest='csv', help='Input CSV file.')
     parser.add_argument('-o', '--output', dest='output', default='test.csv',
                         help='Output CSV file')
+    parser.add_argument('-n', dest='nEvents', help='Number of events to test.')
     parser.add_argument('-v', '--version', action='version',
                         version='%(prog)s v0.0')
 
@@ -78,24 +79,31 @@ def parseIDList(compactList):
             sys.exit(3)
     return requests
 
-def getTestScript(PrepID):
+def getTestScript(PrepID, nEvents):
     request_type = "requests"
     if "chain_" in PrepID:
         request_type = "chained_requests"
-    get_test =  "curl --insecure \
+
+    get_test = ""
+    if nEvents is None:
+        get_test =  "curl --insecure \
 https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s -o %s.sh" % (
-        request_type, PrepID, PrepID)
+            request_type, PrepID, PrepID)
+    else:
+        get_test =  "curl --insecure \
+https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s/%s -o %s.sh" % (
+            request_type, PrepID, nEvents, PrepID)
     # add "/N" to end of URL to get N events
     print get_test
     subprocess.call(get_test, shell=True)
     subprocess.call("chmod 755 %s.sh" % (PrepID), shell=True)
     return
 
-def createTest(compactPrepIDList, outputFile):
+def createTest(compactPrepIDList, outputFile, nEvents):
     requests = parseIDList(compactPrepIDList)
     print "Testing %d requests" % (len(requests))
     for req in requests:
-        getTestScript(req.getPrepId())
+        getTestScript(req.getPrepId(), nEvents)
     return
 
 def extractTest(csvFile):
@@ -107,7 +115,7 @@ def main():
         print "Error: Cannot use both -i and -f."
         sys.exit(1)
     elif args.ids:
-        createTest(args.ids,args.output)
+        createTest(args.ids,args.output,args.nEvents)
     elif args.csv:
         extractTest(args.csv)
     else:
