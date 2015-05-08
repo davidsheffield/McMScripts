@@ -15,6 +15,7 @@
 import sys
 import argparse
 import csv
+from requestClass import * # Load class to store request information
 
 def getArguments():
     parser = argparse.ArgumentParser(description='Test McM requests.')
@@ -31,7 +32,53 @@ def getArguments():
     args_ = parser.parse_args()
     return args_
 
+def fillIDRange(pwg, campaign, first, last):
+    first = int(first)
+    last = int(last)
+    requests = []
+    if first > last:
+        print "Error: PrepID range out of order. %s-%s-%05d > %s-%s-%05d" % (
+            pwg, campaign, first, pwg, campaign, last)
+        print "Exiting with status 4."
+        sys.exit(4)
+
+    for number in range(first, last+1):
+        tmpReq = Request()
+        tmpReq.setPrepId("%s-%s-%05d" % (pwg, campaign, number))
+        requests.append(tmpReq)
+    return requests
+
+def parseIDList(compactList):
+    splitList = compactList.split(',')
+    requests = []
+    for subList in splitList:
+        splitSubList = subList.split('-')
+        if len(splitSubList) == 3:
+            tmpReq = Request()
+            tmpReq.setPrepId(subList)
+            requests.append(tmpReq)
+        elif len(splitSubList) == 4:
+            requests = requests + fillIDRange(splitSubList[0], splitSubList[1],
+                                              splitSubList[2], splitSubList[3])
+        elif len(splitSubList) == 6:
+            if splitSubList[0] != splitSubList[3]:
+                print "Error: PrepID range must be for the same PWG."
+                print "Exiting with status 4"
+                sys.exit(4)
+            if splitSubList[1] != splitSubList[4]:
+                print "Error: PrepID range must be for the same campaign."
+                print "Exiting with status 4"
+                sys.exit(4)
+            requests = requests + fillIDRange(splitSubList[0], splitSubList[1],
+                                              splitSubList[2], splitSubList[5])
+        else:
+            print "Error: Poorly formed PrepID list."
+            print "Exiting with status 3."
+            sys.exit(3)
+    return requests
+
 def createTest(compactPrepIDList, outputFile):
+    requests = parseIDList(compactPrepIDList)
     return
 
 def extractTest(csvFile):
