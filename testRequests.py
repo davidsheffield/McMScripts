@@ -111,11 +111,17 @@ def submitToBatch(PrepId):
 
 def createTest(compactPrepIDList, outputFile, nEvents):
     requests = parseIDList(compactPrepIDList)
+
+    csvfile = csv.writer(open(outputFile, 'w'))
+    csvfile.writerow(['PrepId','JobId','Time per event [s]'
+                      'Size per event [kB]'])
+
     print "Testing %d requests" % (len(requests))
     for req in requests:
         getTestScript(req.getPrepId(), nEvents)
         jobID = submitToBatch(req.getPrepId())
-        print "Submitted %s to job %s" % (req.getPrepId(), jobID)
+        req.setJobID(jobID)
+        csvfile.writerow([req.getPrepId(), req.getJobID(), "", ""])
     return
 
 def extractTest(csvFile):

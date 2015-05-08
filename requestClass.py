@@ -29,6 +29,7 @@ class Request:
         self.usePrepId_             = False
         self.useSequencesCustomise_ = False
         self.useProcessString_      = False
+        self.useJobID_              = False
 
     def setDataSetName(self,x):
         self.DataSetName_ = x
@@ -87,6 +88,9 @@ class Request:
     def setProcessString(self,x):
         self.ProcessString_ = x
         self.useProcessString_ = True
+    def setJobID(self,x):
+        self.JobID_ = x
+        self.useJobID_ = True
 
     def getDataSetName(self):
         return self.DataSetName_
@@ -126,6 +130,8 @@ class Request:
         return self.SequencesCustomise_
     def getProcessString(self):
         return self.ProcessString_
+    def getJobID(self):
+        return self.JobID_
 
     def useDataSetName(self):
         return self.useDataSetName_
@@ -165,3 +171,5 @@ class Request:
         return self.useSequencesCustomise_
     def useProcessString(self):
         return self.useProcessString_
+    def useJobID(self):
+        return self.useJobID_
