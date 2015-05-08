@@ -16,6 +16,7 @@ import sys
 import subprocess
 import argparse
 import csv
+import re
 from requestClass import * # Load class to store request information
 
 def getArguments():
@@ -104,15 +105,17 @@ def submitToBatch(PrepId):
     print batch_command
     output = subprocess.Popen(batch_command, stdout=subprocess.PIPE,
                               shell=True).communicate()[0]
-    print output
-    return
+    match = re.match('Job <(\d*)> is',output)
+    jobID = match.group(1)
+    return jobID
 
 def createTest(compactPrepIDList, outputFile, nEvents):
     requests = parseIDList(compactPrepIDList)
     print "Testing %d requests" % (len(requests))
     for req in requests:
         getTestScript(req.getPrepId(), nEvents)
-        submitToBatch(req.getPrepId())
+        jobID = submitToBatch(req.getPrepId())
+        print "Submitted %s to job %s" % (req.getPrepId(), jobID)
     return
 
 def extractTest(csvFile):
