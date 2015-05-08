@@ -13,6 +13,7 @@
 ################################
 
 import sys
+import subprocess
 import argparse
 import csv
 from requestClass import * # Load class to store request information
@@ -77,8 +78,24 @@ def parseIDList(compactList):
             sys.exit(3)
     return requests
 
+def getTestScript(PrepID):
+    request_type = "requests"
+    if "chain_" in PrepID:
+        request_type = "chained_requests"
+    get_test =  "curl --insecure \
+https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s -o %s.sh" % (
+        request_type, PrepID, PrepID)
+    # add "/N" to end of URL to get N events
+    print get_test
+    subprocess.call(get_test, shell=True)
+    subprocess.call("chmod 755 %s.sh" % (PrepID), shell=True)
+    return
+
 def createTest(compactPrepIDList, outputFile):
     requests = parseIDList(compactPrepIDList)
+    print "Testing %d requests" % (len(requests))
+    for req in requests:
+        getTestScript(req.getPrepId())
     return
 
 def extractTest(csvFile):
