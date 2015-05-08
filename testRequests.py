@@ -99,11 +99,20 @@ https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s/%s -o %s.sh" % (
     subprocess.call("chmod 755 %s.sh" % (PrepID), shell=True)
     return
 
+def submitToBatch(PrepId):
+    batch_command = "bsub -q 8nh %s.sh" % (PrepId)
+    print batch_command
+    output = subprocess.Popen(batch_command, stdout=subprocess.PIPE,
+                              shell=True).communicate()[0]
+    print output
+    return
+
 def createTest(compactPrepIDList, outputFile, nEvents):
     requests = parseIDList(compactPrepIDList)
     print "Testing %d requests" % (len(requests))
     for req in requests:
         getTestScript(req.getPrepId(), nEvents)
+        submitToBatch(req.getPrepId())
     return
 
 def extractTest(csvFile):
