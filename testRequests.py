@@ -113,7 +113,7 @@ def createTest(compactPrepIDList, outputFile, nEvents):
     requests = parseIDList(compactPrepIDList)
 
     csvfile = csv.writer(open(outputFile, 'w'))
-    csvfile.writerow(['PrepId','JobId','Time per event [s]'
+    csvfile.writerow(['PrepId', 'JobId', 'Time per event [s]',
                       'Size per event [kB]'])
 
     print "Testing %d requests" % (len(requests))
@@ -276,11 +276,31 @@ def fillFields(csvfile, fields):
         requests.append(tmpReq)
     return requests, num_requests
 
+def rewriteCSVFile(csvfile, requests):
+    csvWriter = csv.writer(csvfile)
+    csvWriter.writerow(['PrepId', 'JobId', 'Time per event [s]',
+                        'Size per event [kB]'])
+
+    for req in requests:
+        timePerEvent = ""
+        if req.useTime(): timePerEvent = req.getTime()
+        sizePerEvent = ""
+        if req.useSize(): sizePerEvent = req.getSize()
+
+        csvWriter.writerow([req.getPrepId(), req.getJobID(), timePerEvent,
+                            sizePerEvent])
+    return
+
 def extractTest(csvFile):
     csvfile = open(csvFile, 'r') # Open CSV file
     fields = getFields(csvfile)  # Get list of field indices
     # Fill list of request objects from CSV file and get number of requests
     requests, num_requests = fillFields(csvfile, fields)
+    csvfile.close()
+
+    csvfile = open(csvFile,'w')
+    rewriteCSVFile(csvfile, requests)
+
     return
 
 def main():
