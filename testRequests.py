@@ -13,6 +13,7 @@
 ################################
 
 import sys
+import os
 import subprocess
 import argparse
 import csv
@@ -291,12 +292,56 @@ def rewriteCSVFile(csvfile, requests):
                             sizePerEvent])
     return
 
+def getTimeSizeFromFile(stdoutFile):
+    totalSize = 0
+    timePerEvent = 0
+    nEvents = 0
+    fileContents = open(stdoutFile, 'r')
+    for line in fileContents:
+        match = re.match('<TotalEvents>(\d*)</TotalEvents>', line)
+        if match is not None:
+            nEvents = float(match.group(1))
+            continue
+        match = re.match('    <Metric Name="Timing-tstoragefile-write-totalMegabytes" Value="(\d*\.\d*)"/>', line)
+        if match is not None:
+            totalSize = float(match.group(1))
+            continue
+        match = re.match('    <Metric Name="AvgEventCPU" Value="(\d*\.\d*)"/>', line)
+        if match is not None:
+            timePerEvent = float(match.group(1))
+            continue
+
+    sizePerEvent = totalSize*1024.0/nEvents
+    return timePerEvent, sizePerEvent
+
+def getTimeSize(requests):
+    number_complete = 0
+    for req in requests:
+        if not req.useTime() or not req.useSize():
+            stdoutFile = "LSFJOB_%s/STDOUT" % (req.getJobID())
+            if os.path.exists(stdoutFile):
+                number_complete += 1
+                timePerEvent, sizePerEvent = getTimeSizeFromFile(stdoutFile)
+                req.setTime(timePerEvent)
+                req.setSize(sizePerEvent)
+        else:
+            number_complete += 1
+
+    if number_complete == len(requests):
+        print "Extracted info for all %d requests." % (len(requests))
+    else:
+        print "Extracted info for %d of %d requests. %d requests remain." % (
+            number_complete, len(requests), len(requests) - number_complete)
+    return
+
 def extractTest(csvFile):
     csvfile = open(csvFile, 'r') # Open CSV file
     fields = getFields(csvfile)  # Get list of field indices
     # Fill list of request objects from CSV file and get number of requests
     requests, num_requests = fillFields(csvfile, fields)
     csvfile.close()
+
+    getTimeSize(requests)
 
     csvfile = open(csvFile,'w')
     rewriteCSVFile(csvfile, requests)
