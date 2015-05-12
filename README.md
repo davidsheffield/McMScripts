@@ -77,6 +77,34 @@ The field PrepId is only used in modifying requests, where it is required.
 
 The input.csv file can be tested with a dry run using the flag `-d`. Additionally, you can submit to the dev/test instance of McM using the flag `--dev`.
 
+# Usage of testRequests.py
+
+This script will submit lxbatch jobs to test requests and chained requests. It creates a CSV file when tests are submitted that contains the PrepIDs and lxbatch job ID of every request. Chained requests will have separate entries for the chained request's wmLHE request and GS request with a shared job ID. When the batch jobs finish, `testRequests.py` can be run again to update the CSV file to include the time and size per event. This CSV file can be used with `manageRequests.py` to add the time and size per event to McM.
+
+## Creating tests
+
+If you are testing a chained request, you must first get a CERN SSO cookie to access McM to get the chained request's component request PrepIDs. No other operations require that.
+
+Create a test of requests with the command
+
+`python testRequests.py -i PrepIDList`
+
+Nonconsecutive PrepIDs can be separated by a comma `,` while ranges can be specified by a dash `-`. The final request in a range can either be specified with its full PrepID (in which case, the PWG and campaign must match that of the first PrepID) or just the numbercan be used. The following command will test seven requests from two campaigns:
+
+`python testRequests.py -i EXO-RunIIWinter15GS-00001,EXO-RunIIWinter15GS-00003-EXO-RunIIWinter15GS-00005,EXO-chain_RunIIWinter15wmLHE_flowRunIIWinter15wmLHEtoGS-00002-4`
+
+The output CSV file can be specified with the flag `-o file.csv`. The default filename is `test.csv`.The number of events tested will be McM's default. To use N events for all tests, add the flag `-n N`.
+
+## Extracting test results
+
+To extract the time and size per event from the tests, run the command
+
+`python testRequests.py -f file.csv`
+
+on the file created when the tests were submitted.
+
+The script will extract the average time and size of events and store it in the CSV file. If `testRequests.py` is run before all batch jobs finish, it will tell you how many requests still need to have their information filled. The script can be run any number of times to update the remaining requests.
+
 # Usage of validateChains.py
 
 To validate multiple chained requests in McM run the command
