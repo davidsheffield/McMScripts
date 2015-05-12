@@ -18,6 +18,8 @@ import subprocess
 import argparse
 import csv
 import re
+sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
+from rest import * # Load class to access McM
 from requestClass import * # Load class to store request information
 
 def getArguments():
@@ -122,7 +124,16 @@ def createTest(compactPrepIDList, outputFile, nEvents):
         getTestScript(req.getPrepId(), nEvents)
         jobID = submitToBatch(req.getPrepId())
         req.setJobID(jobID)
-        csvfile.writerow([req.getPrepId(), req.getJobID(), "", ""])
+        searched = re.search('chain_', req.getPrepId())
+        if searched is None:
+            csvfile.writerow([req.getPrepId(), req.getJobID(), "", ""])
+        else:
+            mcm = restful(dev=False) # Get McM connection
+            mcm_req = mcm.getA('chained_requests',req.getPrepId())
+            wmLHEPrepId = mcm_req['chain'][0]
+            GSPrepId = mcm_req['chain'][1]
+            csvfile.writerow([wmLHEPrepId, req.getJobID(), "", ""])
+            csvfile.writerow([GSPrepId, req.getJobID(), "", ""])
     return
 
 def exitDuplicateField(file_in_,field_):
