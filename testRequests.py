@@ -33,7 +33,7 @@ def getArguments():
                         help='Output CSV file')
     parser.add_argument('-n', dest='nEvents', help='Number of events to test.')
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s v0.0')
+                        version='%(prog)s v1.0')
 
     args_ = parser.parse_args()
     return args_
