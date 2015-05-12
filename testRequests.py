@@ -303,7 +303,7 @@ def rewriteCSVFile(csvfile, requests):
                             sizePerEvent])
     return
 
-def getTimeSizeFromFile(stdoutFile):
+def getTimeSizeFromFile(stdoutFile, iswmLHE):
     totalSize = 0
     timePerEvent = 0
     nEvents = 0
@@ -317,10 +317,12 @@ def getTimeSizeFromFile(stdoutFile):
         if match is not None:
             totalSize = float(match.group(1))
             continue
-        match = re.match('    <Metric Name="AvgEventCPU" Value="(\d*\.\d*)"/>', line)
+        match = re.match('    <Metric Name="AvgEventCPU" Value="(\d*\.\d*)"/>',
+                         line)
         if match is not None:
             timePerEvent = float(match.group(1))
-            continue
+            if iswmLHE: break
+            else: continue
 
     sizePerEvent = totalSize*1024.0/nEvents
     return timePerEvent, sizePerEvent
@@ -332,7 +334,12 @@ def getTimeSize(requests):
             stdoutFile = "LSFJOB_%s/STDOUT" % (req.getJobID())
             if os.path.exists(stdoutFile):
                 number_complete += 1
-                timePerEvent, sizePerEvent = getTimeSizeFromFile(stdoutFile)
+                iswmLHE = False
+                searched = re.search('wmLHE', req.getPrepId())
+                if searched is not None:
+                    iswmLHE = True
+                timePerEvent, sizePerEvent = getTimeSizeFromFile(stdoutFile,
+                                                                 iswmLHE)
                 req.setTime(timePerEvent)
                 req.setSize(sizePerEvent)
         else:
