@@ -175,6 +175,7 @@ externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 
     if cards != "":
         code += """
+
 # Link to cards:
 # %s
 """ % (cards)
