@@ -34,7 +34,7 @@ def getArguments():
     parser.add_argument('--dev', action='store_true', dest='useDev', help='Use dev/test instance.')
     parser.add_argument('-l', '--lhe', action='store_true', dest='isLHErequest', help='Check dataset when modifying requests. Fail and do not modify name if they conflict. Use for updating GS requests chained to wmLHE and pLHE requests.')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.0')
-    
+
     args_ = parser.parse_args()
     return args_
 
@@ -202,7 +202,7 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
         if fields[14] > -1:
             campaign = row[fields[14]]
             tmpReq.setCamp(campaign)
-        elif not notCreate_:
+        else:
             tmpReq.setCamp(campaign)
         if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
         if fields[5] > -1: tmpReq.setTime(row[fields[5]])
@@ -322,10 +322,19 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
 
         if reqFields.useDataSetName():
             if isLHErequest:
-                mod_req = mcm.getA('requests',query="dataset_name="+reqFields.getDataSetName())[0]
-                if mod_req['dataset_name'] != reqFields.getDataSetName():
-                    print reqFields.getPrepId(),"modification failed. Dataset name does not match McM."
+                if not reqFields.useCamp():
+                    print "%s modification failed. Must provide campaign." % \
+                        (reqFields.getDataSetName())
                     continue
+                query_string = "dataset_name=%s&member_of_campaign=%s" % \
+                    (reqFields.getDataSetName(), reqFields.getCamp())
+                mod_req_list = mcm.getA('requests',query=query_string)
+                if len(mod_req_list) !=1:
+                    print "%s modification failed. Too many requests match query." \
+                        % (reqFields.getDataSetName())
+                    continue
+                else:
+                    mod_req = mod_req_list[0]
             else:
                 mod_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
@@ -350,9 +359,10 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             answer = mcm.updateA('requests',mod_req) # Update request
             if answer['results']:
                 if not isLHErequest:
-                    print reqFields.getPrepId(),"modified"
+                    print "%s modified" % (reqFields.getPrepId())
                 else:
-                    print reqFields.getDataSetName(),"modified"
+                    print "%s (%s) modified" % (reqFields.getPrepId(),
+                                                reqFields.getDataSetName())
             else:
                 if not isLHErequest:
                     print reqFields.getPrepId(),"failed to be modified"
@@ -417,7 +427,7 @@ def main():
     # Store variable that is true if script is asked to modify or clone
     notCreate = checkNotCreate(args.doModify,args.cloneId)
     checkFile(args.file_in) # Ensure CSV file exists
-    
+
     if args.useDev:
         print "Using dev/test instance."
 
@@ -435,6 +445,6 @@ def main():
     else:
         # Create new requests
         createRequests(requests, num_requests, args.doDryRun, args.useDev)
-    
+
 if __name__ == '__main__':
     main()
