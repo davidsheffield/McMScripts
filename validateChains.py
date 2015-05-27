@@ -54,7 +54,7 @@ def validate(chains):
         if chain_output['results']:
             print "%s validating" % (PrepID)
         else:
-            print "%s will not be validated" % (PrepID)
+            print "%s will not be validated, due to the following reason: \n    %s" % (PrepID,chain_output['message'])
 
 def main():
     args = getArguments()             # Setup flags and get arguments
