@@ -310,19 +310,23 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
     else:
         print "Dry run. %d requests will not be modified in McM." % num_requests
     for reqFields in requests:
-        if not reqFields.usePrepId():
-            print "PrepId is missing."
-            continue
+        if not isLHErequest:
+            if not reqFields.usePrepId():
+                print "PrepId is missing."
+                continue
         
         # Get request from McM
-        mod_req = mcm.getA('requests',reqFields.getPrepId())
+        if not isLHErequest:
+            mod_req = mcm.getA('requests',reqFields.getPrepId())
+            mod_req['dataset_name'] = reqFields.getDataSetName()
+
         if reqFields.useDataSetName():
             if isLHErequest:
+                mod_req = mcm.getA('requests',query="dataset_name="+reqFields.getDataSetName())[0]
                 if mod_req['dataset_name'] != reqFields.getDataSetName():
                     print reqFields.getPrepId(),"modification failed. Dataset name does not match McM."
                     continue
-            else:
-                mod_req['dataset_name'] = reqFields.getDataSetName()
+
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
@@ -344,12 +348,23 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         if not doDryRun:
             answer = mcm.updateA('requests',mod_req) # Update request
             if answer['results']:
-                print reqFields.getPrepId(),"modified"
+                if not isLHErequest:
+                    print reqFields.getPrepId(),"modified"
+                else:
+                    print reqFields.getDataSetName(),"modified"
             else:
-                print reqFields.getPrepId(),"failed to be modified"
+                if not isLHErequest:
+                    print reqFields.getPrepId(),"failed to be modified"
+                else:
+                    print reqFields.getDataSetName(),"failed to be modified"
         else:
-            print reqFields.getPrepId(),"not modified"
-            pprint.pprint(mod_req)
+            if not isLHErequest:
+                print reqFields.getPrepId(),"not modified"
+                pprint.pprint(mod_req)
+            else:
+                print reqFields.getDataSetName(),"not modified"
+                pprint.pprint(mod_req)
+
 
 def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
     # Create new requests be cloning an old one based on PrepId
