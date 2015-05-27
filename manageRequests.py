@@ -251,7 +251,7 @@ def createRequests(requests, num_requests, doDryRun, useDev):
     if not doDryRun:
         print "Adding %d requests to McM." % num_requests
     else:
-        print "Dry run. %d requests will not be added to McM." % num_requests 
+        print "Dry run. %d requests will not be added to McM." % num_requests
     for reqFields in requests:
         if not reqFields.useCamp():
             print "A campaign is needed for new requests."
@@ -314,7 +314,7 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             if not reqFields.usePrepId():
                 print "PrepId is missing."
                 continue
-        
+
         # Get request from McM
         if not isLHErequest:
             mod_req = mcm.getA('requests',reqFields.getPrepId())
@@ -326,7 +326,8 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
                 if mod_req['dataset_name'] != reqFields.getDataSetName():
                     print reqFields.getPrepId(),"modification failed. Dataset name does not match McM."
                     continue
-
+            else:
+                mod_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
