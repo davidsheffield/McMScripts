@@ -100,6 +100,19 @@ https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s/%s -o %s.sh" % (
     # add "/N" to end of URL to get N events
     print get_test
     subprocess.call(get_test, shell=True)
+
+    if request_type == "chained_requests" and nEvents is not None:
+        filename = "%s.sh" % (PrepID)
+        tmpfilename = "tmp%s.sh" % (PrepID)
+        inputfile = open(filename, 'r')
+        outputfile = open(tmpfilename, 'w')
+        for line in inputfile:
+            outputfile.write(re.sub('(.*RAWSIM.*-n) \d*( .*)', r'\1 %s\2'
+                                    % (nEvents), line))
+        inputfile.close()
+        outputfile.close()
+        os.rename(tmpfilename, filename)
+
     subprocess.call("chmod 755 %s.sh" % (PrepID), shell=True)
     return
 
