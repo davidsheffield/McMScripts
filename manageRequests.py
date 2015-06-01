@@ -310,33 +310,31 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
     else:
         print "Dry run. %d requests will not be modified in McM." % num_requests
     for reqFields in requests:
-        if not isLHErequest:
+        # Get request from McM
+        if isLHErequest:
+            if not reqFields.useDataSetName():
+                print "Dataset name missing"
+                continue
+            elif not reqFields.useCamp():
+                print "%s modification failed. Must provide campaign." \
+                    % (reqFields.getDataSetName())
+                continue
+            query_string = "dataset_name=%s&member_of_campaign=%s" \
+                %  (reqFields.getDataSetName(), reqFields.getCamp())
+            mod_req_list = mcm.getA('requests', query=query_string)
+            if len(mod_req_list) !=1:
+                print "%s modification failed. Too many requests match query." \
+                    % (reqFields.getDataSetName())
+                continue
+            mod_req = mod_req_list[0]
+        else:
             if not reqFields.usePrepId():
                 print "PrepId is missing."
                 continue
-
-        # Get request from McM
-        if not isLHErequest:
             mod_req = mcm.getA('requests',reqFields.getPrepId())
-            mod_req['dataset_name'] = reqFields.getDataSetName()
 
-        if reqFields.useDataSetName():
-            if isLHErequest:
-                if not reqFields.useCamp():
-                    print "%s modification failed. Must provide campaign." % \
-                        (reqFields.getDataSetName())
-                    continue
-                query_string = "dataset_name=%s&member_of_campaign=%s" % \
-                    (reqFields.getDataSetName(), reqFields.getCamp())
-                mod_req_list = mcm.getA('requests',query=query_string)
-                if len(mod_req_list) !=1:
-                    print "%s modification failed. Too many requests match query." \
-                        % (reqFields.getDataSetName())
-                    continue
-                else:
-                    mod_req = mod_req_list[0]
-            else:
-                mod_req['dataset_name'] = reqFields.getDataSetName()
+        if reqFields.useDataSetName() and not isLHErequest:
+            mod_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useMCDBID(): mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
