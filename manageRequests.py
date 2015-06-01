@@ -202,7 +202,7 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
         if fields[14] > -1:
             campaign = row[fields[14]]
             tmpReq.setCamp(campaign)
-        else:
+        elif campaign is not None:
             tmpReq.setCamp(campaign)
         if fields[4] > -1: tmpReq.setFrag(formatFragment(row[fields[4]],campaign))
         if fields[5] > -1: tmpReq.setTime(row[fields[5]])
