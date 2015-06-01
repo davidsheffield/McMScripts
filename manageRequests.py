@@ -339,7 +339,7 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         if reqFields.useEvts(): mod_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): mod_req['name_of_fragment'] = reqFields.getFrag()
         if reqFields.useTag(): mod_req['fragment_tag'] = reqFields.getTag()
-        if reqFields.useMcMFrag(): new_req['fragment'] = reqFields.getMcMFrag()
+        if reqFields.useMcMFrag(): mod_req['fragment'] = reqFields.getMcMFrag()
         if reqFields.useTime(): mod_req['time_event'] = reqFields.getTime()
         if reqFields.useSize(): mod_req['size_event'] = reqFields.getSize()
         if reqFields.useGen(): mod_req['generators'] = reqFields.getGen()
