@@ -359,8 +359,8 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
                 if not isLHErequest:
                     print "%s modified" % (reqFields.getPrepId())
                 else:
-                    print "%s (%s) modified" % (reqFields.getPrepId(),
-                                                reqFields.getDataSetName())
+                    print "%s in %s modified" % (reqFields.getDataSetName(),
+                                                 reqFields.getCamp())
             else:
                 if not isLHErequest:
                     print reqFields.getPrepId(),"failed to be modified"
