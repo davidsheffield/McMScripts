@@ -1,3 +1,16 @@
+#!/usr/bin/env python
+
+################################
+#
+# validateChains
+#
+#  Script to validate a range of chained
+#  request PrepIDs at once.
+#
+#  author: David G. Sheffield (Rutgers)
+#
+################################
+
 import sys
 import os.path
 import argparse
