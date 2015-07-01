@@ -90,11 +90,11 @@ def getTestScript(PrepID, nEvents):
 
     get_test = ""
     if nEvents is None:
-        get_test =  "curl --insecure \
+        get_test =  "curl -s --insecure \
 https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s -o %s.sh" % (
             request_type, PrepID, PrepID)
     else:
-        get_test =  "curl --insecure \
+        get_test =  "curl -s --insecure \
 https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s/%s -o %s.sh" % (
             request_type, PrepID, nEvents, PrepID)
     # add "/N" to end of URL to get N events
