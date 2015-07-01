@@ -328,6 +328,10 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             query_string = "dataset_name=%s&member_of_campaign=%s" \
                 %  (reqFields.getDataSetName(), reqFields.getCamp())
             mod_req_list = mcm.getA('requests', query=query_string)
+            if mod_req_list is None:
+                print "%s modification failed. Could not get request from McM."\
+                    % (reqFields.getDataSetName())
+                continue
             if len(mod_req_list) !=1:
                 print "%s modification failed. Too many requests match query." \
                     % (reqFields.getDataSetName())
