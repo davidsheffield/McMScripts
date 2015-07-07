@@ -28,13 +28,13 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ ! -f $1 ]; then
-    echo "Error: File ${1} does not exist"
+if [ ! -f $csvfile ]; then
+    echo "Error: File ${csvfile} does not exist"
     echo "Usage: sh copyGridpacks.sh file.csv"
     exit 1
 fi
 
-echo "Copying $(($(wc -l < ${1}) - 1)) gridpacks to /store/group/phys_generator/cvmfs/gridpacks/"
+echo "Copying $(($(wc -l < ${csvfile}) - 1)) gridpacks to /store/group/phys_generator/cvmfs/gridpacks/"
 
 ind_local=-1
 ind_final=-1
@@ -43,22 +43,22 @@ isFirstLine=1
 while read -a line; do
     if [ $isFirstLine == 1 ]; then
 	for i in "${!line[@]}"; do
-	    if [ ${line[i]} == "Local gridpack location" ]; then
+	    if [ "${line[i]}" == "Local gridpack location" ]; then
 		ind_local=$i
 	    fi
-	    if [ ${line[i]} == "Gridpack location" ]; then
+	    if [ "${line[i]}" == "Gridpack location" ]; then
 		ind_final=$i
 	    fi
 	done
 
 	if [ $ind_local == -1 ] && [ $ind_final == -1 ]; then
-	    echo 'Error: Could not find "Gridpack location" or "Local gridpack location" in ${1}.'
+	    echo 'Error: Could not find "Gridpack location" or "Local gridpack location" in ${csvfile}.'
 	    exit 2
 	elif [ $ind_local == -1 ]; then
-	    echo 'Error: Could not find "Local gridpack location" in ${1}.'
+	    echo 'Error: Could not find "Local gridpack location" in ${csvfile}.'
 	    exit 2
 	elif [ $ind_final == -1 ]; then
-	    echo 'Error: Could not find "Gridpack location" in ${1}.'
+	    echo 'Error: Could not find "Gridpack location" in ${csvfile}.'
 	    exit2
 	fi
 
@@ -86,4 +86,4 @@ while read -a line; do
     else
 	echo -e "\033[0;31mFailed to copy ${local_file}\033[0m"
     fi
-done < $1
+done < $csvfile
