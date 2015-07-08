@@ -39,6 +39,8 @@ echo "Copying $(($(wc -l < ${csvfile}) - 1)) gridpacks to /store/group/phys_gene
 ind_local=-1
 ind_final=-1
 
+failures=0
+
 isFirstLine=1
 while read -a line; do
     if [ $isFirstLine == 1 ]; then
@@ -85,5 +87,12 @@ while read -a line; do
 	echo -e "\033[0;32m${name}\033[0m"
     else
 	echo -e "\033[0;31mFailed to copy ${local_file}\033[0m"
+	failures=$((failures + 1))
     fi
 done < $csvfile
+
+if [ $failures == 0 ]; then
+    echo "Successfully copied all gridpacks."
+else
+    echo "Failed to copy ${failures} gridpacks."
+fi
