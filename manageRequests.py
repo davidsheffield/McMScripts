@@ -319,27 +319,27 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         # Get request from McM
         if isLHErequest:
             if not reqFields.useDataSetName():
-                print "Dataset name missing"
+                print "\033[1;31mDataset name missing\033[1;m"
                 continue
             elif not reqFields.useCamp():
-                print "%s modification failed. Must provide campaign." \
+                print "\033[1;31m%s modification failed. Must provide campaign.\033[1;m" \
                     % (reqFields.getDataSetName())
                 continue
             query_string = "dataset_name=%s&member_of_campaign=%s" \
                 %  (reqFields.getDataSetName(), reqFields.getCamp())
             mod_req_list = mcm.getA('requests', query=query_string)
             if mod_req_list is None:
-                print "%s modification failed. Could not get request from McM."\
+                print "\033[1;31m%s modification failed. Could not get request from McM.\033[1;m"\
                     % (reqFields.getDataSetName())
                 continue
             if len(mod_req_list) !=1:
-                print "%s modification failed. Too many requests match query." \
+                print "\033[1;31m%s modification failed. Too many requests match query.\033[1;m" \
                     % (reqFields.getDataSetName())
                 continue
             mod_req = mod_req_list[0]
         else:
             if not reqFields.usePrepId():
-                print "PrepId is missing."
+                print "\033[1;31mPrepId is missing.\033[1;m"
                 continue
             mod_req = mcm.getA('requests',reqFields.getPrepId())
 
@@ -368,15 +368,15 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             answer = mcm.updateA('requests',mod_req) # Update request
             if answer['results']:
                 if not isLHErequest:
-                    print "%s modified" % (reqFields.getPrepId())
+                    print "\033[1;32m%s modified\033[1;m" % (reqFields.getPrepId())
                 else:
-                    print "%s in %s modified" % (reqFields.getDataSetName(),
+                    print "\033[1;32m%s in %s modified\033[1;m" % (reqFields.getDataSetName(),
                                                  reqFields.getCamp())
             else:
                 if not isLHErequest:
-                    print reqFields.getPrepId(),"failed to be modified"
+                    print "\033[1;31m",reqFields.getPrepId(),"failed to be modified\033[1;m"
                 else:
-                    print reqFields.getDataSetName(),"failed to be modified"
+                    print "\033[1;31m",reqFields.getDataSetName(),"failed to be modified\033[1;m"
         else:
             if not isLHErequest:
                 print reqFields.getPrepId(),"not modified"
