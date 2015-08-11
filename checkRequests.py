@@ -15,7 +15,7 @@ import os
 import subprocess
 import argparse
 import csv
-import re
+import pprint
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 
@@ -79,9 +79,19 @@ def checkRequests(requests, useDev):
 
     for PrepID in requests:
         base_req = mcm.getA('requests', PrepID)
-        print base_req['status']
-        print base_req['member_of_chain']
+        print "{0} {1}".format(PrepID, base_req['status'])
 
+        for chainID in base_req['member_of_chain']:
+            #print chainID
+            chain_req = mcm.getA('chained_requests', chainID)
+            space = ""
+            for i, member in enumerate(chain_req['chain']):
+                if i == 0:
+                    continue
+                space = space + " "
+                req = mcm.getA('requests', member)
+                print "{0}{1} {2}".format(space, member, req['status'])
+        print ""
     return
 
 
