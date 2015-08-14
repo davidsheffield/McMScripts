@@ -78,18 +78,45 @@ def checkRequests(requests, useDev):
     mcm = restful(dev=useDev) # Get McM connection
 
     for PrepID in requests:
-        base_req = mcm.getA('requests', PrepID)
+        failed_to_get = True
+        for tries in range(3):
+            base_req = mcm.getA('requests', PrepID)
+            if base_req is not None:
+                failed_to_get = False
+                break
+        if failed_to_get:
+            print "\033[1;31mCould not get base request {0}\033[1;m\n".format(
+                PrepID)
+            continue
         print "{0} {1}".format(PrepID, base_req['status'])
 
         for chainID in base_req['member_of_chain']:
             #print chainID
-            chain_req = mcm.getA('chained_requests', chainID)
+            failed_to_get = True
+            for tries in range(3):
+                chain_req = mcm.getA('chained_requests', chainID)
+                if chain_req is not None:
+                    failed_to_get = False
+                    break
+            if failed_to_get:
+                print "\033[1;31mCould not get chain {0}\033[1;m\n".format(
+                    chainID)
+                continue
             space = ""
             for i, member in enumerate(chain_req['chain']):
                 if i == 0:
                     continue
                 space = space + " "
-                req = mcm.getA('requests', member)
+                failed_to_get = True
+                for tries in range(3):
+                    req = mcm.getA('requests', member)
+                    if req is not None:
+                        failed_to_get = False
+                        break
+                if failed_to_get:
+                    print "\033[1;31mCould not get chained request {0}\033[1;m\n"\
+                        .format(member)
+                    continue
                 print "{0}{1} {2}".format(space, member, req['status'])
         print ""
     return
