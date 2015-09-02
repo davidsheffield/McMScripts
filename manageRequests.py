@@ -144,11 +144,11 @@ def getFields(csvfile_,file_in_):
                        'Gridpack cards location', 'Cards location']:
             if list[19] > -1: exitDuplicateField(file_in_,"Gridpack cards URL")
             list[19] = ind
-        elif field in ['JobId']:
-            continue
         elif field in ['Notes', 'notes']:
             if list[20] > -1: exitDuplicateField(file_in_,"Notes")
             list[20] = ind
+        elif field in ['JobId', 'Local gridpack location', 'Local LHE']:
+            continue
         else:
             print "Error: The field %s is not valid." % field
             print "Exiting with status 4."
