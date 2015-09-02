@@ -15,6 +15,7 @@ import os.path
 import argparse
 import csv
 import pprint
+import time
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 from requestClass import * # Load class to store request information
@@ -329,6 +330,7 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
                 %  (reqFields.getDataSetName(), reqFields.getCamp())
             failed_to_get = True
             for tries in range(3):
+                time.sleep(0.1)
                 mod_req_list = mcm.getA('requests', query=query_string)
                 if mod_req_list is not None:
                     failed_to_get = False
@@ -346,6 +348,7 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             if not reqFields.usePrepId():
                 print "\033[1;31mPrepId is missing.\033[1;m"
                 continue
+            time.sleep(0.1)
             mod_req = mcm.getA('requests',reqFields.getPrepId())
 
         if reqFields.useDataSetName() and not isLHErequest:
