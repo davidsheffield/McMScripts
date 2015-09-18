@@ -337,7 +337,10 @@ def getTimeSizeFromFile(stdoutFile, iswmLHE):
             if iswmLHE: break
             else: continue
 
-    sizePerEvent = totalSize*1024.0/nEvents
+    if nEvents != 0:
+        sizePerEvent = totalSize*1024.0/nEvents
+    else:
+        sizePerEvent = -1
     return timePerEvent, sizePerEvent
 
 def getTimeSize(requests):
