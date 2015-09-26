@@ -27,6 +27,7 @@ def getArguments():
     # Command line flags
     parser.add_argument('query')
     parser.add_argument('-n', action='store_true', dest='isNew', help='Only get requests with unmodified time and size per event.')
+    parser.add_argument('-c', action='store_true', dest='getChain', help='Return PrepID of chain.')
 
     args_ = parser.parse_args()
     return args_
@@ -40,7 +41,7 @@ def checkFile(file_):
         sys.exit(1)
 
 
-def getPrepIDList(query_string, isNew):
+def getPrepIDList(query_string, isNew, getChain):
     useDev = False
     mcm = restful( dev=useDev ) # Get McM connection
     print query_string
@@ -54,7 +55,10 @@ def getPrepIDList(query_string, isNew):
             if isNew:
                 if req['time_event'] == -1 or req['size_event'] == -1:
                     continue
-            out_list.append(req['prepid'])
+            if not getChain:
+                out_list.append(req['prepid'])
+            else:
+                out_list.append(req['member_of_chain'][0])
     print "Found {0} requests".format(len(out_list))
     return out_list
 
@@ -73,7 +77,7 @@ def printList(list):
 def main():
     args = getArguments() # Setup flags and get arguments
 
-    list = getPrepIDList(args.query, args.isNew)
+    list = getPrepIDList(args.query, args.isNew, args.getChain)
     printList(list)
 
     return
