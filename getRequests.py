@@ -26,7 +26,8 @@ def getArguments():
 
     # Command line flags
     parser.add_argument('query')
-    parser.add_argument('-n', action='store_true', dest='isNew', help='Only get requests with unmodified time and size per event.')
+    parser.add_argument('-n', action='store_true', dest='getNew', help='Only get requests with unmodified time and size per event.')
+    parser.add_argument('-v', action='store_true', dest='getForValidation', help='Only get requests with positive time and size per event.')
     parser.add_argument('-c', action='store_true', dest='getChain', help='Return PrepID of chain.')
 
     args_ = parser.parse_args()
@@ -41,7 +42,7 @@ def checkFile(file_):
         sys.exit(1)
 
 
-def getPrepIDList(query_string, isNew, getChain):
+def getPrepIDList(query_string, getNew, getForValidation, getChain):
     useDev = False
     mcm = restful( dev=useDev ) # Get McM connection
     print query_string
@@ -52,8 +53,11 @@ def getPrepIDList(query_string, isNew, getChain):
         print "\033[1;31mCould not get requests from McM\033[1;m"
     else:
         for req in req_list:
-            if isNew:
-                if req['time_event'] == -1 or req['size_event'] == -1:
+            if getNew:
+                if req['time_event'] != -1 or req['size_event'] != -1:
+                    continue
+            if getForValidation:
+                if req['time_event'] <= 0 or req['size_event'] <= 0:
                     continue
             if not getChain:
                 out_list.append(req['prepid'])
@@ -77,7 +81,8 @@ def printList(list):
 def main():
     args = getArguments() # Setup flags and get arguments
 
-    list = getPrepIDList(args.query, args.isNew, args.getChain)
+    list = getPrepIDList(args.query, args.getNew, args.getForValidation,
+                         args.getChain)
     printList(list)
 
     return
