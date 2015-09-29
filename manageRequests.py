@@ -339,9 +339,13 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
                 print "\033[1;31m%s modification failed. Could not get request from McM.\033[1;m"\
                     % (reqFields.getDataSetName())
                 continue
-            if len(mod_req_list) !=1:
-                print "\033[1;31m%s modification failed. Too many requests match query.\033[1;m" \
-                    % (reqFields.getDataSetName())
+            if len(mod_req_list) > 1:
+                print "\033[1;31m{0} modification failed. Too many requests match query.\033[1;m".format(
+                    reqFields.getDataSetName())
+                continue
+            elif len(mod_req_list) == 0:
+                print "\033[1;31m{0} modification failed. No requests match query.\033[1;m".format(
+                    reqFields.getDataSetName())
                 continue
             mod_req = mod_req_list[0]
         else:
