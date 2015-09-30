@@ -17,44 +17,57 @@ import argparse
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 
+
 def getArguments():
     parser = argparse.ArgumentParser(description='Validate chains in McM.')
 
     # Command line flags
-    parser.add_argument('range', type=str, nargs=2, metavar='PrepID PrepID',
-                        help='First and last PrepIDs to be validated.')
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.0')
+    parser.add_argument('ids', metavar='PrepIDs',
+                        help='List of PrepIDs for chains to be validated.')
 
     args_ = parser.parse_args()
     return args_
 
-def checkPrepIDs(first,last):
-    firstList = first.split('-')
-    lastList = last.split('-')
 
-    shouldExit = False
-    if firstList[0] != lastList[0]:
-        print "PrepIDs must be for ethe same PWG."
-        shouldExit = True
-    if firstList[1] != lastList[1]:
-        print "PrepIDs must be for the same campaign."
-        shouldExit = True
-
-    if shouldExit:
+def fillIDRange(pwg, campaign, first, last):
+    first = int(first)
+    last = int(last)
+    chains = []
+    if first > last:
+        print "Error: PrepID range out of order. {0}-{1}-{2:05d} > {3}-{4}-{5:05d}".format(
+            pwg, campaign, first, pwg, campaign, last)
         sys.exit(1)
-    elif firstList[2] > lastList[2]:
-        print "The first PrepID must be smaller than the last PrepID."
-        sys.exit(2)
 
-def getChainList(PrepIDrange):
-    checkPrepIDs(PrepIDrange[0],PrepIDrange[1])
+    for number in range(first, last+1):
+        chains.append("{0}-{1}-{2:05d}".format(pwg, campaign, number))
+    return chains
 
-    firstSplit = PrepIDrange[0].split('-')
-    PrepIDList = []
-    for number in  range(int(firstSplit[2]), int(PrepIDrange[1].split('-')[2])+1):
-        PrepIDList.append("%s-%s-%05d" % (firstSplit[0], firstSplit[1], number))
 
-    return PrepIDList
+def parseIDList(compactList):
+    print compactList
+    splitList = compactList.split(',')
+    chains = []
+    for subList in splitList:
+        splitSubList = subList.split('-')
+        if len(splitSubList) == 3:
+            chains.append(subList)
+        elif len(splitSubList) == 4:
+            chains += fillIDRange(splitSubList[0], splitSubList[1],
+                                  splitSubList[2], splitSubList[3])
+        elif len(splitSubList) == 6:
+            if splitSubList[0] != splitSubList[3]:
+                print "Error: PrepID range must be for the same PWG."
+                sys.exit(1)
+            if splitSubList[1] != splitSubList[4]:
+                print "Error: PrepID range must be for the same chained campaign."
+                sys.exit(1)
+            chains += fillIDRange(splitSubList[0], splitSubList[1],
+                                  splitSubList[2], splitSubList[5])
+        else:
+            print "Error: Poorly formed PrepID list."
+            sys.exit(1)
+    return chains
+
 
 def validate(chains):
     mcm = restful(dev=False)
@@ -69,10 +82,12 @@ def validate(chains):
         else:
             print "%s will not be validated, due to the following reason: \n    %s" % (PrepID,chain_output['message'])
 
+
 def main():
     args = getArguments()             # Setup flags and get arguments
-    chains = getChainList(args.range) # Get list of chains and check args
+    chains = parseIDList(args.ids)    # Get list of chains and check args
     validate(chains)                  # Tell McM to validate chains
+
 
 if __name__ == '__main__':
     main()
