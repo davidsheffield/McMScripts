@@ -50,6 +50,7 @@ def getPrepIDList(query_string, getNew, getForValidation, getChain):
     print query_string
     req_list = mcm.getA('requests', query=query_string)
 
+    event_sum = 0
     out_list = []
     if req_list is None:
         print "\033[1;31mCould not get requests from McM\033[1;m"
@@ -63,9 +64,11 @@ def getPrepIDList(query_string, getNew, getForValidation, getChain):
                     continue
             if not getChain:
                 out_list.append(req['prepid'])
+                event_sum += req['total_events']
             else:
                 out_list.append(req['member_of_chain'][0])
-    print "Found {0} requests".format(len(out_list))
+    print "Found {0} requests with {1}M events".format(len(out_list),
+                                                       event_sum/1e6)
     return out_list
 
 
