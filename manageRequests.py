@@ -413,7 +413,7 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if reqFields.useEvts(): clone_req['total_events'] = reqFields.getEvts()
         if reqFields.useFrag(): clone_req['name_of_fragment'] = reqFields.getFrag()
         if reqFields.useTag(): clone_req['fragment_tag'] = reqFields.getTag()
-        if reqFields.useMcMFrag(): new_req['fragment'] = reqFields.getMcMFrag()
+        if reqFields.useMcMFrag(): clone_req['fragment'] = reqFields.getMcMFrag()
         if reqFields.useTime(): clone_req['time_event'] = reqFields.getTime()
         if reqFields.useSize(): clone_req['size_event'] = reqFields.getSize()
         if reqFields.useGen(): clone_req['generators'] = reqFields.getGen()
@@ -422,9 +422,9 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if reqFields.useFiltEffErr(): clone_req['generator_parameters'][0]['filter_efficiency_error'] = reqFields.getFiltEffErr()
         if reqFields.useMatchEff(): clone_req['generator_parameters'][0]['match_efficiency'] = reqFields.getMatchEff()
         if reqFields.useMatchEffErr(): clone_req['generator_parameters'][0]['match_efficiency_error'] = reqFields.getMatchEffErr()
-        if reqFields.useSequencesCustomise(): mod_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
-        if reqFields.useProcessString(): mod_req['process_string'] = reqFields.getProcessString()
-        if reqFields.useNotes(): mod_req['notes'] = reqFields.getNotes()
+        if reqFields.useSequencesCustomise(): clone_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
+        if reqFields.useProcessString(): clone_req['process_string'] = reqFields.getProcessString()
+        if reqFields.useNotes(): clone_req['notes'] = reqFields.getNotes()
 
         if not doDryRun:
             answer = mcm.clone(cloneId_,clone_req) # Clone request
