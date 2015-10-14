@@ -107,8 +107,13 @@ https://cms-pdmv.cern.ch/mcm/public/restapi/%s/get_test/%s/%s -o %s.sh" % (
         inputfile = open(filename, 'r')
         outputfile = open(tmpfilename, 'w')
         for line in inputfile:
-            outputfile.write(re.sub('(.*RAWSIM.*-n) \d*( .*)', r'\1 %s\2'
-                                    % (nEvents), line))
+            outline = re.sub('(.*--eventcontent LHE.*-n) \d*( .*)', r'\1 %s\2'
+                                    % (nEvents), line)
+            outline = re.sub('(.*--eventcontent DQM.*-n) \d*( .*)', r'\1 %s\2'
+                                    % (nEvents), outline)
+            outline = re.sub('(.*--eventcontent RAWSIM.*-n) \d*( .*)', r'\1 %s\2'
+                                    % (nEvents), outline)
+            outputfile.write(outline)
         inputfile.close()
         outputfile.close()
         os.rename(tmpfilename, filename)
