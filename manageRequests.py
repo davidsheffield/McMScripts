@@ -156,16 +156,19 @@ def getFields(csvfile_,file_in_):
 
     return list
 
-def formatFragment(file_,campaign_):
+def formatFragment(file_, campaign_):
     if len(file_.split("/")) > 1:
         return file_
-    elif campaign_ in ['Summer12']: # 8TeV
+    # 8TeV campaign
+    elif campaign_ in ['Summer12']:
         return "Configuration/GenProduction/python/EightTeV/"+file_
-    elif campaign_ in ['Fall13','RunIIFall14GS','RunIIWinter15GS','RunIIWinter15wmLHE','RunIIWinter15pLHE']: # 13 TeV
+    # 13 TeV campaigns
+    elif campaign_ in ['Fall13', 'RunIIFall14GS', 'RunIIWinter15GS',
+                       'RunIIWinter15wmLHE', 'RunIIWinter15pLHE',
+                       'RunIISummer15GS']:
         return "Configuration/GenProduction/python/ThirteenTeV/"+file_
     else:
-        print "Error: Cannot determine energy of campaign %s." % campaign_
-        print "Exiting with status 5."
+        print "Error: Cannot determine energy of campaign {0}.".format(campaign_)
         sys.exit(5)
 
 def createLHEProducer(gridpack, cards):
