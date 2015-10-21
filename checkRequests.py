@@ -36,9 +36,8 @@ def fillIDRange(pwg, campaign, first, last):
     last = int(last)
     requests = []
     if first > last:
-        print "Error: PrepID range out of order. %s-%s-%05d > %s-%s-%05d" % (
-            pwg, campaign, first, pwg, campaign, last)
-        print "Exiting with status 4."
+        print "Error: PrepID range out of order. {0}-{1}-{2:05d} > {0}-{1}-{3:05d}".format(
+            pwg, campaign, first, last)
         sys.exit(4)
 
     for number in range(first, last+1):
@@ -59,17 +58,14 @@ def parseIDList(compactList):
         elif len(splitSubList) == 6:
             if splitSubList[0] != splitSubList[3]:
                 print "Error: PrepID range must be for the same PWG."
-                print "Exiting with status 4"
                 sys.exit(4)
             if splitSubList[1] != splitSubList[4]:
                 print "Error: PrepID range must be for the same campaign."
-                print "Exiting with status 4"
                 sys.exit(4)
             requests = requests + fillIDRange(splitSubList[0], splitSubList[1],
                                               splitSubList[2], splitSubList[5])
         else:
             print "Error: Poorly formed PrepID list."
-            print "Exiting with status 3."
             sys.exit(3)
     return requests
 

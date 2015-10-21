@@ -34,8 +34,8 @@ def fillIDRange(pwg, campaign, first, last):
     last = int(last)
     chains = []
     if first > last:
-        print "Error: PrepID range out of order. {0}-{1}-{2:05d} > {3}-{4}-{5:05d}".format(
-            pwg, campaign, first, pwg, campaign, last)
+        print "Error: PrepID range out of order. {0}-{1}-{2:05d} > {0}-{1}-{3:05d}".format(
+            pwg, campaign, first, last)
         sys.exit(1)
 
     for number in range(first, last+1):
@@ -72,21 +72,22 @@ def parseIDList(compactList):
 def validate(chains):
     mcm = restful(dev=False)
 
-    print "Validating %d chained requests" % (len(chains))
+    print "Validating {0} chained requests".format(len(chains))
     for PrepID in chains:
-        url = 'restapi/chained_requests/test/%s' % (PrepID)
+        url = 'restapi/chained_requests/test/{0}'.format(PrepID)
         chain_output = mcm.get(url)
 
         if chain_output['results']:
-            print "%s validating" % (PrepID)
+            print "{0} validating".format(PrepID)
         else:
-            print "%s will not be validated, due to the following reason: \n    %s" % (PrepID,chain_output['message'])
+            print "{0} will not be validated, due to the following reason:\n{1}".format(
+                PrepID, chain_output['message'])
 
 
 def main():
-    args = getArguments()             # Setup flags and get arguments
-    chains = parseIDList(args.ids)    # Get list of chains and check args
-    validate(chains)                  # Tell McM to validate chains
+    args = getArguments()          # Setup flags and get arguments
+    chains = parseIDList(args.ids) # Get list of chains and check args
+    validate(chains)               # Tell McM to validate chains
 
 
 if __name__ == '__main__':
