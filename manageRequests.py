@@ -369,21 +369,22 @@ def createRequests(requests, num_requests, doDryRun, useDev):
                 # Update request with generator parameters
                 update_answer = mcm.updateA('requests', mod_req)
                 if update_answer['results']:
-                    print "{0} created".format(answer['prepid'])
+                    print "\033[0;32m{0} created\033[0;m".format(answer['prepid'])
                 else:
-                    print "{0} created but generator parameters not set".format(
+                    print "\033[0;33m{0} created but generator parameters not set\033[0;m".format(
                         answer['prepid'])
             else:
                 if reqFields.useDataSetname():
-                    print "{0} failed to be created".format(
+                    print "\033[0;31m{0} failed to be created\033[0;m".format(
                         reqFields.getDataSetName())
                 else:
-                    print "A request has failed to be created"
+                    print "\033[0;31mA request has failed to be created\033[0;m"
         else:
             if reqFields.useDataSetName():
-                print "{0} not created".format(reqFields.getDataSetName())
+                print "\033[0;31m{0} not created\033[0;m".format(
+                    reqFields.getDataSetName())
             else:
-                print "request not created"
+                print "\033[0;31mrequest not created\033[0;m"
             pprint.pprint(new_req)
 
 def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
@@ -399,10 +400,10 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         # Get request from McM
         if isLHErequest:
             if not reqFields.useDataSetName():
-                print "\033[1;31mDataset name missing\033[1;m"
+                print "\033[0;31mDataset name missing\033[0;m"
                 continue
             elif not reqFields.useCamp():
-                print "\033[1;31m{0} modification failed. Must provide campaign.\033[1;m".format(
+                print "\033[0;31m{0} modification failed. Must provide campaign.\033[0;m".format(
                     reqFields.getDataSetName())
                 continue
             query_string = "dataset_name={0}&member_of_campaign={1}".format(
@@ -415,21 +416,21 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
                     failed_to_get = False
                     break
             if failed_to_get:
-                print "\033[1;31m{0} modification failed. Could not get request from McM.\033[1;m".format(
+                print "\033[0;31m{0} modification failed. Could not get request from McM.\033[0;m".format(
                     reqFields.getDataSetName())
                 continue
             if len(mod_req_list) > 1:
-                print "\033[1;31m{0} modification failed. Too many requests match query.\033[1;m".format(
+                print "\033[0;31m{0} modification failed. Too many requests match query.\033[0;m".format(
                     reqFields.getDataSetName())
                 continue
             elif len(mod_req_list) == 0:
-                print "\033[1;31m{0} modification failed. No requests match query.\033[1;m".format(
+                print "\033[0;31m{0} modification failed. No requests match query.\033[0;m".format(
                     reqFields.getDataSetName())
                 continue
             mod_req = mod_req_list[0]
         else:
             if not reqFields.usePrepId():
-                print "\033[1;31mPrepId is missing.\033[1;m"
+                print "\033[0;31mPrepId is missing.\033[0;m"
                 continue
             time.sleep(0.1)
             mod_req = mcm.getA('requests', reqFields.getPrepId())
@@ -488,24 +489,26 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             answer = mcm.updateA('requests', mod_req) # Update request
             if answer['results']:
                 if not isLHErequest:
-                    print "\033[1;32m{0} modified\033[1;m".format(
+                    print "\033[0;32m{0} modified\033[0;m".format(
                         reqFields.getPrepId())
                 else:
-                    print "\033[1;32m{0} in {1} modified\033[1;m".format(
+                    print "\033[0;32m{0} in {1} modified\033[0;m".format(
                         reqFields.getDataSetName(), reqFields.getCamp())
             else:
                 if not isLHErequest:
-                    print "\033[1;31m{0} failed to be modified\033[1;m".format(
+                    print "\033[0;31m{0} failed to be modified\033[0;m".format(
                         reqFields.getPrepId())
                 else:
-                    print "\033[1;31m{0} failed to be modified\033[1;m".format(
+                    print "\033[0;31m{0} failed to be modified\033[0;m".format(
                         reqFields.getDataSetName())
         else:
             if not isLHErequest:
-                print "{0} not modified".format(reqFields.getPrepId())
+                print "\033[0;31m{0} not modified\033[0;m".format(
+                    reqFields.getPrepId())
                 pprint.pprint(mod_req)
             else:
-                print "{0} not modified".format(reqFields.getDataSetName())
+                print "\033[0;31m{0} not modified\033[0;m".format(
+                    reqFields.getDataSetName())
                 pprint.pprint(mod_req)
 
 
@@ -564,19 +567,20 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if not doDryRun:
             answer = mcm.clone(cloneId_, clone_req) # Clone request
             if answer['results']:
-                print "{0} created using clone".format(answer['prepid'])
+                print "\033[0;32m{0} created using clone\033[0;m".format(
+                    answer['prepid'])
             else:
                 if reqFields.useDataSetName():
-                    print "{0} failed to be created using clone".format(
+                    print "\033[0;31m{0} failed to be created using clone\033[0;m".format(
                         reqFields.getDataSetName())
                 else:
-                    print "request failed to be created using clone"
+                    print "\033[0;31mrequest failed to be created using clone\033[0;m"
         else:
             if reqFields.useDataSetName():
-                print "{0} not created using clone".format(
+                print "\033[0;31m{0} not created using clone\033[0;m".format(
                     reqFields.getDataSetName())
             else:
-                print "request not created using clone"
+                print "\033[0;31mrequest not created using clone\033[0;m"
             pprint.pprint(clone_req)
 
 def main():
