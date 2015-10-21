@@ -193,7 +193,7 @@ def getFields(csvfile_, file_in_):
             if list[20] > -1:
                 exitDuplicateField(file_in_, "Notes")
             list[20] = ind
-        elif field in ['JobId', 'Local gridpack location', 'Local LHE']:
+        elif field in ['JobId', 'Local gridpack location', 'Local LHE', 'LHE']:
             continue
         else:
             print "Error: The field {0} is not valid.".format(field)
