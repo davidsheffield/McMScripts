@@ -89,76 +89,83 @@ def getPrepIDListWithAttributes(query_string,listAttr):
     print '\n'
     print '======================================================================================================================================================================\n'
     for req in req_list:
-        # print '======================================================================================================================================================================\n',\
-              # '======================================================================================================================================================================'
-        print bcolors.MAGENTA +\
-              'prepid='+ bcolors.ENDC,req['prepid'],\
-              ', '+bcolors.MAGENTA+'Dataset name='+ bcolors.ENDC,req['dataset_name'],\
-              ', '+bcolors.MAGENTA+'Extension='+ bcolors.ENDC,req['extension'],\
-              ', '+bcolors.MAGENTA+'Completed/Total events='+ bcolors.ENDC,str(req['completed_events'])+'/'+str(req['total_events']),\
-              ''+ bcolors.ENDC
-        if listAttr > 0:
-            print bcolors.RED +\
-                  'Approval='+ bcolors.ENDC,req['approval'],\
-                  ', '+bcolors.RED+'Status='+ bcolors.ENDC,req['status'],\
-                  ', '+bcolors.RED+'Time Event='+ bcolors.ENDC,req['time_event'],\
-                  ', '+bcolors.RED+'CMSSW Release='+ bcolors.ENDC,req['cmssw_release'],\
-                  ', '+bcolors.RED+'Priority='+ bcolors.ENDC,req['priority'],\
+        if listAttr > 5: # full dump of the request object, useful for debugging purpose
+            print bcolors.MAGENTA +\
+                  'prepid='+ bcolors.ENDC,req['prepid'],\
                   ''+ bcolors.ENDC
-        if listAttr > 1:
-            if(len(req['generator_parameters'])>0):
-                print bcolors.GREEN +\
-                    'Cross Section='+ bcolors.ENDC,req['generator_parameters'][0]['cross_section'],'pb',\
-                    ', '+bcolors.GREEN+'Filter efficiency='+ bcolors.ENDC,str(req['generator_parameters'][0]['filter_efficiency'])+' +/- '+str(req['generator_parameters'][0]['filter_efficiency_error']),\
-                    ', '+bcolors.GREEN+'Match efficiency='+ bcolors.ENDC,str(req['generator_parameters'][0]['match_efficiency'])+' +/- '+str(req['generator_parameters'][0]['match_efficiency_error']),\
-                    ''+ bcolors.ENDC
-            else:
-                print bcolors.GREEN +\
-                    'Cross Section= -1 pb',\
-                    ', Filter efficiency= -1',\
-                    ', Match efficiency= -1',\
-                    ''+ bcolors.ENDC
-            print bcolors.CYAN +\
-                  'Tags='+ bcolors.ENDC,str(req['tags']).replace("u'",'').replace("'",""),\
-                  ', '+bcolors.CYAN+'Generators='+ bcolors.ENDC,req['name_of_fragment'],\
-                  ', '+bcolors.CYAN+'Name of Fragment='+ bcolors.ENDC,req['name_of_fragment'],\
-                  ', '+bcolors.CYAN+'Notes='+ bcolors.ENDC,req['notes'],\
+            print str(req).replace("u'",'')
+            print ''
+        else:
+            # print '======================================================================================================================================================================\n',\
+                  # '======================================================================================================================================================================'
+            print bcolors.MAGENTA +\
+                  'prepid='+ bcolors.ENDC,req['prepid'],\
+                  ', '+bcolors.MAGENTA+'Dataset name='+ bcolors.ENDC,req['dataset_name'],\
+                  ', '+bcolors.MAGENTA+'Extension='+ bcolors.ENDC,req['extension'],\
+                  ', '+bcolors.MAGENTA+'Completed/Total events='+ bcolors.ENDC,str(req['completed_events'])+'/'+str(req['total_events']),\
                   ''+ bcolors.ENDC
-        if listAttr > 2:
-            print bcolors.BLUE +\
-                  'Last Updater Name='+ bcolors.ENDC,req['history'][0]['updater']['author_name'],\
-                  '(',req['history'][0]['updater']['author_email'],')',\
-                  '\n'\
-                  + bcolors.Gray_like_Ghost +\
-                  'McM View Link= https://cms-pdmv.cern.ch/mcm/requests?shown=2199023255551&prepid='+req['prepid'],\
-                  '\n'\
-                  'McM Edit Link= https://cms-pdmv.cern.ch/mcm/edit?db_name=requests&prepid='+req['prepid'],\
-                  ''+ bcolors.ENDC
-        if listAttr > 3:
-            print bcolors.YELLOW +\
-              'Member of chain(s)'
-            for current_chain in req['member_of_chain']:
-                query_chains = "member_of_chain="+current_chain
-                # print "req['member_of_chain'][0]",query_chains
-                temp = sys.stdout
-                f = open('/dev/null', 'w')
-                sys.stdout = f
-                chained_prepIds=getMcMlist(query_chains,False)
-                sys.stdout = temp
-                prepid1 = []
-                for req1 in chained_prepIds:
-                  prepid1.append(req1['prepid'])
-                print current_chain+" : "+ bcolors.ENDC+str(prepid1).strip('[]').replace("u'",'').replace("'","")
-                print bcolors.Gray_like_Ghost +\
-                'McM View Link= https://cms-pdmv.cern.ch/mcm/chained_requests?shown=4095&prepid='+current_chain,\
-                ''+ bcolors.YELLOW
-        if listAttr > 4:
-            print bcolors.WHITE +'Fragment code=\n'+\
-                  bcolors.Gray_like_Ghost +\
-                  req['fragment'],\
-                  ''+ bcolors.ENDC
-            print '\n'
-        print bcolors.ENDC
+            if listAttr > 0:
+                print bcolors.RED +\
+                      'Approval='+ bcolors.ENDC,req['approval'],\
+                      ', '+bcolors.RED+'Status='+ bcolors.ENDC,req['status'],\
+                      ', '+bcolors.RED+'Time Event='+ bcolors.ENDC,req['time_event'],\
+                      ', '+bcolors.RED+'CMSSW Release='+ bcolors.ENDC,req['cmssw_release'],\
+                      ', '+bcolors.RED+'Priority='+ bcolors.ENDC,req['priority'],\
+                      ''+ bcolors.ENDC
+            if listAttr > 1:
+                if(len(req['generator_parameters'])>0):
+                    print bcolors.GREEN +\
+                        'Cross Section='+ bcolors.ENDC,req['generator_parameters'][0]['cross_section'],'pb',\
+                        ', '+bcolors.GREEN+'Filter efficiency='+ bcolors.ENDC,str(req['generator_parameters'][0]['filter_efficiency'])+' +/- '+str(req['generator_parameters'][0]['filter_efficiency_error']),\
+                        ', '+bcolors.GREEN+'Match efficiency='+ bcolors.ENDC,str(req['generator_parameters'][0]['match_efficiency'])+' +/- '+str(req['generator_parameters'][0]['match_efficiency_error']),\
+                        ''+ bcolors.ENDC
+                else:
+                    print bcolors.GREEN +\
+                        'Cross Section= -1 pb',\
+                        ', Filter efficiency= -1',\
+                        ', Match efficiency= -1',\
+                        ''+ bcolors.ENDC
+                print bcolors.CYAN +\
+                      'Tags='+ bcolors.ENDC,str(req['tags']).replace("u'",'').replace("'",""),\
+                      ', '+bcolors.CYAN+'Generators='+ bcolors.ENDC,req['name_of_fragment'],\
+                      ', '+bcolors.CYAN+'Name of Fragment='+ bcolors.ENDC,req['name_of_fragment'],\
+                      ', '+bcolors.CYAN+'Notes='+ bcolors.ENDC,req['notes'],\
+                      ''+ bcolors.ENDC
+            if listAttr > 2:
+                print bcolors.BLUE +\
+                      'Last Updater Name='+ bcolors.ENDC,req['history'][0]['updater']['author_name'],\
+                      '(',req['history'][0]['updater']['author_email'],')',\
+                      '\n'\
+                      + bcolors.Gray_like_Ghost +\
+                      'McM View Link= https://cms-pdmv.cern.ch/mcm/requests?shown=2199023255551&prepid='+req['prepid'],\
+                      '\n'\
+                      'McM Edit Link= https://cms-pdmv.cern.ch/mcm/edit?db_name=requests&prepid='+req['prepid'],\
+                      ''+ bcolors.ENDC
+            if listAttr > 3:
+                print bcolors.YELLOW +\
+                  'Member of chain(s)'
+                for current_chain in req['member_of_chain']:
+                    query_chains = "member_of_chain="+current_chain
+                    # print "req['member_of_chain'][0]",query_chains
+                    temp = sys.stdout
+                    f = open('/dev/null', 'w')
+                    sys.stdout = f
+                    chained_prepIds=getMcMlist(query_chains,False)
+                    sys.stdout = temp
+                    prepid1 = []
+                    for req1 in chained_prepIds:
+                      prepid1.append(req1['prepid'])
+                    print current_chain+" : "+ bcolors.ENDC+str(prepid1).strip('[]').replace("u'",'').replace("'","")
+                    print bcolors.Gray_like_Ghost +\
+                    'McM View Link= https://cms-pdmv.cern.ch/mcm/chained_requests?shown=4095&prepid='+current_chain,\
+                    ''+ bcolors.YELLOW
+            if listAttr > 4:
+                print bcolors.WHITE +'Fragment code=\n'+\
+                      bcolors.Gray_like_Ghost +\
+                      req['fragment'],\
+                      ''+ bcolors.ENDC
+            print bcolors.ENDC
+        
         print '======================================================================================================================================================================\n\n',\
         
 def getPrepIDList(query_string, getNew, getForValidation, getChain):
