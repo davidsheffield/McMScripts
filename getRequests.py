@@ -135,11 +135,11 @@ def getPrepIDListWithAttributes(query_string,listAttr):
                       'Last Updater Name='+ bcolors.ENDC,req['history'][0]['updater']['author_name'],\
                       '(',req['history'][0]['updater']['author_email'],')',\
                       '\n'\
-                      + bcolors.Gray_like_Ghost +\
+                      + bcolors.ENDC +\
                       'McM View Link= https://cms-pdmv.cern.ch/mcm/requests?shown=2199023255551&prepid='+req['prepid'],\
                       '\n'\
                       'McM Edit Link= https://cms-pdmv.cern.ch/mcm/edit?db_name=requests&prepid='+req['prepid'],\
-                      ''+ bcolors.ENDC
+                      ''
             if listAttr > 3:
                 print bcolors.YELLOW +\
                   'Member of chain(s)'
@@ -155,12 +155,12 @@ def getPrepIDListWithAttributes(query_string,listAttr):
                     for req1 in chained_prepIds:
                       prepid1.append(req1['prepid'])
                     print current_chain+" : "+ bcolors.ENDC+str(prepid1).strip('[]').replace("u'",'').replace("'","")
-                    print bcolors.Gray_like_Ghost +\
+                    print bcolors.ENDC +\
                     'McM View Link= https://cms-pdmv.cern.ch/mcm/chained_requests?shown=4095&prepid='+current_chain,\
                     ''+ bcolors.YELLOW
             if listAttr > 4:
-                print bcolors.WHITE +'Fragment code=\n'+\
-                      bcolors.Gray_like_Ghost +\
+                print bcolors.Green_like_Grass +'Fragment code=\n'+\
+                      bcolors.ENDC +\
                       req['fragment'],\
                       ''+ bcolors.ENDC
             print bcolors.ENDC
