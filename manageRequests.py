@@ -16,13 +16,12 @@ import argparse
 import csv
 import pprint
 import time
+import mcmscripts_config
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 from requestClass import * # Load class to store request information
 
 def getArguments():
-    defaultPWG = 'XXX' # Change this line to your PWG, then -p flag is not needed
-
     parser = argparse.ArgumentParser(
         description='Create, modify, and clone McM requests.')
 
@@ -31,8 +30,8 @@ def getArguments():
     parser.add_argument('-c', '--campaign', action='store', dest='campaign',
                         metavar='name', help='Set member_of_campaign.')
     parser.add_argument('-p', '--pwg', action='store', dest='pwg',
-                        default=defaultPWG,
-                        help='Set PWG. Defaults to %(default)s. Change the variable defaultPWG to your PWG.')
+                        default=mcmscripts_config.pwg,
+                        help='Set PWG. Defaults to %(default)s. Change default in config.py')
     parser.add_argument('-m', '--modify', action='store_true', dest='doModify',
                         help='Modify existing requests. The CSV file must contain the PrepIds of the requests to be modified.')
     parser.add_argument('--clone', action='store', dest='cloneId', default='',

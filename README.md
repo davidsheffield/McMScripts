@@ -1,7 +1,7 @@
 Scripts for McM
 ===============
 
-Author: David G. Sheffield (Rutgers)
+Author: David G. Sheffield (Rutgers), extension of getRequests.py by Luca Perrozzi (ETHZ)
 
 Scripts for creating and updating requests in McM. See https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVMcMScript for more information on scripts.
 
@@ -17,6 +17,17 @@ Scripts
 * [**copyPrivateLHEs.sh**](#usage-of-copyprivatelhessh) Copy LHE files to EOS.
 * [**getMcMTestScript.sh**](#usage-of-getmcmtestscriptsh) Get test script from McM with some modifications.
 * [**getTimeSize.sh**](#usage-of-gettimesizesh) Extract time/size per event from cmsRun job report.
+
+Installation
+------------
+
+Once you've created a clone of this repository run the command
+
+```
+git update-index --assume-unchanged mcmscripts_config.py
+```
+
+to avoid committing any changes to your personal configuration file. Then modify the default values in mcmscripts_config.py to use your physics working group and username as default.
 
 Get cookies
 -----------
@@ -55,7 +66,7 @@ Usage of manageRequests.py
 
 ### Setup PWG
 
-The default PWG in manageRequests.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 23. Alternatively, you can include the flag `-p your_PWG`.
+The default PWG in manageRequests.py is set by `mcmscripts_config.py`. To set it to your group, change the configuration file. Alternatively, you can include the flag `-p your_PWG`.
 
 ### Creating new requests
 
@@ -134,6 +145,10 @@ The formatting can be changed with the flag `-f`. The default is `-f 0`, which w
 The script can sort for only requests with time per event and size per event set to -1 with `-n` (e.g., to find requests to test). It can sort for requests with positive time/size per event with `-v` (e.g., to find requests ready for validation).
 
 To obtain a list of chained requests from wmLHE requests you can use the `-c` flag.
+
+NEW: a new funcionality has been added to dump much more information (with COLORS!), to be launched with the flag '--listattr'. The default is `-f 0` (Dataset name, Extension, Number of Completed/Total events). The level of verbosity can be increased to `-f 1` (Status, Time Event, CMSSW Release, Priority), `-f 2` (Cross Section, Filter efficiency, Matching efficiency, Tags, Generators, Name of Fragment, Notes), `-f 3` (Last Updater Name and Email, McM View and Edit Links), `-f 4` (Member of the chains including prepIds of the chained requests and direct McM chain link), and `-f 5` (Fragment code). Example:
+
+`python getRequests.py -listattr 5 "actor=perrozzi&member_of_campaign=*GS*&status=new"`
 
 Usage of testRequests.py
 ------------------------
