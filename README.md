@@ -18,6 +18,17 @@ Scripts
 * [**getMcMTestScript.sh**](#usage-of-getmcmtestscriptsh) Get test script from McM with some modifications.
 * [**getTimeSize.sh**](#usage-of-gettimesizesh) Extract time/size per event from cmsRun job report.
 
+Installation
+------------
+
+Once you've created a clone of this repository run the command
+
+```
+git update-index --assume-unchanged mcmscripts_config.py
+```
+
+to avoid committing any changes to your personal configuration file. Then modify the default values in mcmscripts_config.py to use your physics working group and username as default.
+
 Get cookies
 -----------
 
