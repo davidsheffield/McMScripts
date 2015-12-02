@@ -94,7 +94,7 @@ def getPrepIDListWithAttributes(query_string,listAttr):
             print bcolors.MAGENTA +\
                   'prepid='+ bcolors.ENDC,req['prepid'],\
                   ''+ bcolors.ENDC
-            print str(req).replace("u'","'")
+            pprint.pprint(req)
             print ''
         else:
             print bcolors.MAGENTA +\
