@@ -6,7 +6,8 @@
 #
 #  Script to get a list of requests from McM
 #
-#  author: David G. Sheffield (Rutgers)
+#  authors: David G. Sheffield (Rutgers)
+#           Luca Perrozzi (ETHZ)
 #
 ################################
 
@@ -31,8 +32,8 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     Gray_like_Ghost = '\033[1;30m'
-    RED = '\033[1;31m' 
-    Green_like_Grass = '\033[1;32m' 
+    RED = '\033[1;31m'
+    Green_like_Grass = '\033[1;32m'
     Yellow_like_Yolk = '\033[1;33m'
     Blue_like_Blood = '\033[1;34m'
     Magenta_like_Mimosa = '\033[1;35m'
@@ -87,7 +88,7 @@ def getMcMlist(query_string,printout):
 def getPrepIDListWithAttributes(query_string,listAttr):
     req_list = getMcMlist(query_string,True)
     print '\n'
-    print '======================================================================================================================================================================\n'
+    print '================================================================================\n'
     for req in req_list:
         if listAttr > 5: # full dump of the request object, useful for debugging purpose
             print bcolors.MAGENTA +\
@@ -96,8 +97,6 @@ def getPrepIDListWithAttributes(query_string,listAttr):
             print str(req).replace("u'","'")
             print ''
         else:
-            # print '======================================================================================================================================================================\n',\
-                  # '======================================================================================================================================================================'
             print bcolors.MAGENTA +\
                   'prepid='+ bcolors.ENDC,req['prepid'],\
                   ', '+bcolors.MAGENTA+'Dataset name='+ bcolors.ENDC,req['dataset_name'],\
@@ -165,9 +164,9 @@ def getPrepIDListWithAttributes(query_string,listAttr):
                       req['fragment'],\
                       ''+ bcolors.ENDC
             print bcolors.ENDC
-        
-        print '======================================================================================================================================================================\n\n',\
-        
+
+        print '================================================================================\n\n',\
+
 def getPrepIDList(query_string, getNew, getForValidation, getChain):
     req_list = getMcMlist(query_string,True)
 
@@ -241,14 +240,13 @@ def printList(list, format):
 def main():
     args = getArguments() # Setup flags and get arguments
 
-    print 'args.listAttr',args.listAttr
     if args.listAttr < 0:
         list = getPrepIDList(args.query, args.getNew, args.getForValidation,
                              args.getChain)
         printList(list, args.format)
     else:
         dict = getPrepIDListWithAttributes(args.query,args.listAttr)
-        
+
     return
 
 
