@@ -55,7 +55,7 @@ Usage of manageRequests.py
 
 ### Setup PWG
 
-The default PWG in manageRequests.py is set to XXX. To modify your default PWG, change the variable `defaultPWG` on line 23. Alternatively, you can include the flag `-p your_PWG`.
+The default PWG in manageRequests.py is set by `mcmscripts_config.py`. To set it to your group, change the configuration file. Alternatively, you can include the flag `-p your_PWG`.
 
 ### Creating new requests
 
