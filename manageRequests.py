@@ -42,6 +42,8 @@ def getArguments():
                         help='Use dev/test instance.')
     parser.add_argument('-l', '--lhe', action='store_true', dest='isLHErequest',
                         help='Check dataset when modifying requests. Fail and do not modify name if they conflict. Use for updating GS requests chained to wmLHE and pLHE requests.')
+    parser.add_argument('-t', '--tags', action='append', dest='McMTags',
+                        metavar='tags', help='Tags to append to request in McM.')
 
     args_ = parser.parse_args()
     return args_
@@ -86,7 +88,7 @@ def exitDuplicateField(file_in_, field_):
 def getFields(csvfile_, file_in_):
     # List of indices for each field in CSV file
     list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-             -1, -1, -1, -1]
+             -1, -1, -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name', 'Dataset Name', 'Dataset', 'dataset']:
@@ -192,6 +194,10 @@ def getFields(csvfile_, file_in_):
             if list[20] > -1:
                 exitDuplicateField(file_in_, "Notes")
             list[20] = ind
+        elif field in ['McM tag', 'McM Tag', 'McM tags', 'McM Tags']:
+            if list[21] > -1:
+                exitDuplicateField(file_in_, "McM tags")
+            list[21] = ind
         elif field in ['JobId', 'Local gridpack location', 'Local LHE', 'LHE']:
             continue
         else:
@@ -234,7 +240,7 @@ externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 """.format(cards)
     return code
 
-def fillFields(csvfile, fields, campaign, PWG, notCreate_):
+def fillFields(csvfile, fields, campaign, PWG, notCreate_, McMTags):
     requests = [] # List containing request objects
     num_requests = 0
     for row in csv.reader(csvfile):
@@ -301,6 +307,10 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_):
                 tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], ""))
         if fields[20] > -1:
             tmpReq.setNotes(row[fields[20]])
+        if fields[21] > -1:
+            tmpReq.setMcMTag(row[fields[21]].split(" "))
+        elif McMTags is not None:
+            tmpReq.setMcMTag(McMTags)
         requests.append(tmpReq)
     return requests, num_requests
 
@@ -346,6 +356,8 @@ def createRequests(requests, num_requests, doDryRun, useDev):
             new_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
             new_req['notes'] = reqFields.getNotes()
+        if reqFields.useMcMTag():
+            new_req['tags'] = reqFields.getMcMTag()
 
         if not doDryRun:
             answer = mcm.putA('requests', new_req) # Create request
@@ -483,6 +495,8 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             mod_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
             mod_req['notes'] = reqFields.getNotes()
+        if reqFields.useMcMTag():
+            mod_req['tags'] += reqFields.getMcMTag()
 
         if not doDryRun:
             answer = mcm.updateA('requests', mod_req) # Update request
@@ -562,6 +576,8 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
             clone_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
             clone_req['notes'] = reqFields.getNotes()
+        if reqFields.useMcMTag():
+            clone_req['tags'] += reqFields.getMcMTag()
 
         if not doDryRun:
             answer = mcm.clone(cloneId_, clone_req) # Clone request
@@ -597,7 +613,7 @@ def main():
     fields = getFields(csvfile, args.file_in) # Get list of field indices
     # Fill list of request objects with fields from CSV and get number of requests
     requests, num_requests = fillFields(csvfile, fields, args.campaign,
-                                        args.pwg, notCreate)
+                                        args.pwg, notCreate, args.McMTags)
 
     if args.doModify:
         # Modify existing requests

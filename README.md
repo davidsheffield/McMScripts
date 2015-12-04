@@ -116,6 +116,7 @@ Information for requests is provided in a CSV file. The script reads the first l
 * Gridpack location
 * Gridpack cards URL
 * Notes
+* McM tag
 
 It will also recognize some alternative names. If there is a field title that the script does not recognize, it will complain. The script will ignore columns with the headers "JobId", "Local gridpack location", and "Local LHE" as they are used to supply information to other scripts but do not contain information for McM.
 

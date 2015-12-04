@@ -31,6 +31,7 @@ class Request:
         self.useProcessString_      = False
         self.useJobID_              = False
         self.useNotes_              = False
+        self.useMcMTag_             = False
 
     def setDataSetName(self,x):
         self.DataSetName_ = x
@@ -95,6 +96,9 @@ class Request:
     def setNotes(self, x):
         self.Notes_ = x
         self.useNotes_ = True
+    def setMcMTag(self, x):
+        self.McMTag_ = x
+        self.useMcMTag_ = True
 
     def getDataSetName(self):
         return self.DataSetName_
@@ -138,6 +142,8 @@ class Request:
         return self.JobID_
     def getNotes(self):
         return self.Notes_
+    def getMcMTag(self):
+        return self.McMTag_
 
     def useDataSetName(self):
         return self.useDataSetName_
@@ -181,3 +187,5 @@ class Request:
         return self.useJobID_
     def useNotes(self):
         return self.useNotes_
+    def useMcMTag(self):
+        return self.useMcMTag_
