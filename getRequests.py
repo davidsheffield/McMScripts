@@ -63,7 +63,7 @@ def getArguments():
     parser.add_argument('-listattr', dest='listAttr', type=int, default=-1,
                         help='List attributes for each PrepID. 0 (default) to 5 in increasing level of verbosity')
     parser.add_argument('-f', dest='format', type=int, default=0,
-                        help='Format of output. 0 (default) = input for scripts, 1 = human-readable, 2 = HTML')
+                        help='Format of output. 0 (default) = input for scripts, 1 = human-readable, 2 = HTML, 3 = write every PrepID')
 
     args_ = parser.parse_args()
     return args_
@@ -204,36 +204,43 @@ def isSequential(lastID, currentID):
 
 
 def printList(list, format):
-    arrow = "-"
-    comma = ","
-    if format == 1:
-        arrow = " ---> "
-        comma = ", "
-    elif format == 2:
-        arrow = " ---> "
-        comma = "<br>"
-
-    lastID = "FIRST"
-    print_last = False
-    last_index = len(list) - 1
     print ""
-    for i, PrepID in enumerate(list):
-        if isSequential(lastID, PrepID):
-            if i < last_index:
-                print_last = True
+    if format == 3:
+        for PrepID in list:
+            print PrepID
+        print ""
+    else:
+        arrow = "-"
+        comma = ","
+        if format == 1:
+            arrow = " ---> "
+            comma = ", "
+        elif format == 2:
+            arrow = " ---&gt; "
+            comma = "<br>"
+
+        lastID = "FIRST"
+        print_last = False
+        last_index = len(list) - 1
+        for i, PrepID in enumerate(list):
+            if isSequential(lastID, PrepID):
+                if i < last_index:
+                    print_last = True
+                else:
+                    sys.stdout.write("{0}{1}".format(arrow, PrepID))
             else:
-                sys.stdout.write("{0}{1}".format(arrow, PrepID))
-        else:
-            if print_last:
-                sys.stdout.write("{0}{1}{2}{3}".format(arrow, lastID, comma,
-                                                     PrepID))
-            elif i > 0:
-                sys.stdout.write("{0}{1}".format(comma, PrepID))
-            else:
-                sys.stdout.write("{0}".format(PrepID))
-            print_last = False
-        lastID = PrepID
-    print "\n"
+                if print_last:
+                    sys.stdout.write("{0}{1}{2}{3}".format(arrow, lastID, comma,
+                                                           PrepID))
+                elif i > 0:
+                    sys.stdout.write("{0}{1}".format(comma, PrepID))
+                else:
+                    sys.stdout.write("{0}".format(PrepID))
+                print_last = False
+            lastID = PrepID
+        print ""
+
+    print ""
     return
 
 
