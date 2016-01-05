@@ -20,6 +20,7 @@ import time
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 from requestClass import * # Load class to store request information
+import mcmscripts_config
 
 class bcolorClass:
     MAGENTA = '\033[35m'
@@ -54,7 +55,7 @@ class bcolorClass:
               setattr(self, m, '')
 
     def __init__(self):
-        if not sys.stdout.isatty():
+        if mcmscripts_config.auto_bw and not sys.stdout.isatty():
             self._noColor()
 
 bcolors = bcolorClass()
