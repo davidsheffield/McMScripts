@@ -21,7 +21,7 @@ sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
 from requestClass import * # Load class to store request information
 
-class bcolors:
+class bcolorClass:
     MAGENTA = '\033[35m'
     BLUE = '\033[34m'
     GREEN = '\033[32m'
@@ -48,6 +48,18 @@ class bcolors:
     Highlighted_Gray_like_Ghost = '\033[1;47m'
     Highlighted_Crimson_like_Chianti = '\033[1;48m'
 
+    def _noColor(self):
+        for m in dir(self):
+           if not m.startswith('_'):
+              setattr(self, m, '')
+
+    def __init__(self):
+        if not sys.stdout.isatty():
+            self._noColor()
+
+bcolors = bcolorClass()
+
+
 def getArguments():
     parser = argparse.ArgumentParser(
         description='Get a list of PrepIDs from McM based on a query.')
@@ -62,6 +74,8 @@ def getArguments():
                         help='Return PrepID of chain.')
     parser.add_argument('-listattr', dest='listAttr', type=int, default=-1,
                         help='List attributes for each PrepID. 0 (default) to 5 in increasing level of verbosity')
+    parser.add_argument('-bw', action='store_true', dest='noColors', default=False,
+                        help='B/W output')
     parser.add_argument('-f', dest='format', type=int, default=0,
                         help='Format of output. 0 (default) = input for scripts, 1 = human-readable, 2 = HTML, 3 = write every PrepID')
 
@@ -252,6 +266,8 @@ def main():
                              args.getChain)
         printList(list, args.format)
     else:
+        if args.noColors:
+            bcolors._noColor()
         dict = getPrepIDListWithAttributes(args.query,args.listAttr)
 
     return
