@@ -5,3 +5,6 @@ pwg = 'XXX'
 
 # McM username
 username = 'inewton'
+
+# Automatically remove color when piping or redirecting output
+auto_bw = False
