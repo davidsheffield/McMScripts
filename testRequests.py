@@ -160,111 +160,114 @@ def getFields(csvfile):
              -1, -1, -1, -1]
     header = csv.reader(csvfile).next()
     for ind, field in enumerate(header):
-        if field in ['Dataset name', 'Dataset Name', 'Dataset', 'dataset']:
+        field = field.lower()
+        if field in ['dataset name', 'dataset']:
             #ensure no duplicate fields
             if list[0] > -1:
                 exitDuplicateField(file_in_, "Dataset name")
             list[0] = ind
-        elif field in ['EOS', 'eos', 'Eos', 'MCDBID', 'mcdbid']:
+        elif field in ['eos', 'mcdbid']:
             if list[1] > -1:
                 exitDuplicateField(file_in_, "EOS")
             list[1] = ind
-        elif field in ['Cross section [pb]', 'Cross section',
-                       'Cross section (pb)', 'Cross Section',
-                       'Cross Section [pb]', 'Cross Section (pb)', 'CS',
-                       'CS [pb]', 'CS (pb)', 'Xsec', 'Xsec [pb]', 'Xsec (pb)']:
+        elif field in ['cross section [pb]', 'cross section',
+                       'cross section (pb)', 'cs', 'cs [pb]', 'cs (pb)', 'xsec',
+                       'xsec [pb]', 'xsec (pb)']:
             if list[2] > -1:
-                exitDuplicateField(file_in_, "Cross section")
+                exitDuplicateField(file_in_, "Cross section [pb]")
             list[2] = ind
-        elif field in ['Total events', 'Total Events', 'Events', 'events',
-                       'total events', 'Number of Events']:
+        elif field in ['total events', 'events', 'number of events']:
             if list[3] > -1:
                 exitDuplicateField(file_in_, "Total events")
             list[3] = ind
-        elif field in ['Fragment name', 'Fragment Name',
-                       'Generator fragment name', 'Generator Fragment Name',
-                       'Fragment', 'fragment']:
+        elif field in ['fragment name', 'generator fragment name', 'fragment']:
             if list[4] > -1:
                 exitDuplicateField(file_in_, "Fragment name")
             list[4] = ind
-        elif field in ['Time per event [s]', 'Time per event',
-                       'Time per event (s)', 'Time per Event',
-                       'Time per Event [s]', 'Time per Event (s)', 'Time',
-                       'Time [s]', 'Time (s)', 'time', 'time [s]', 'time (s)']:
+        elif field in ['time per event [s]', 'time per event',
+                       'time per event (s)', 'time', 'time [s]', 'time (s)']:
             if list[5] > -1:
                 exitDuplicateField(file_in_, "Time per event [s]")
             list[5] = ind
-        elif field in ['Size per event [kB]', 'Size per event',
-                       'Size per event (kB)', 'Size per Event',
-                       'Size per Event [kB]', 'Size per Event (kB)',
-                       'size', 'size [kB]', 'size (kB)']:
+        elif field in ['size per event [kb]', 'size per event',
+                       'size per event (kb)', 'size', 'size [kb]', 'size (kb)']:
             if list[6] > -1:
                 exitDuplicateField(file_in_, "Size per event [kB]")
             list[6] = ind
-        elif field in ['Tag', 'tag', 'Fragment Tag', 'Fragment tag',
-                       'fragment tag', 'sha', 'SHA', 'SHA-1', 'sha-1']:
+        elif field in ['tag', 'fragment tag', 'sha', 'sha-1']:
             if list[7] > -1:
                 exitDuplicateField(file_in_, "Fragment tag")
             list[7] = ind
-        elif field in ['Generator', 'generator']:
+        elif field in ['generator', 'generators']:
             if list[8] > -1:
                 exitDuplicateField(file_in_, "Generator")
             list[8] = ind
-        elif field in ['Filter efficiency', 'FilterEfficiency',
-                       'filter efficiency']:
+        elif field in ['filter efficiency']:
             if list[9] > -1:
                 exitDuplicateField(file_in_, "Filter efficiency")
             list[9] = ind
-        elif field in ['Filter efficiency error', 'Filter Efficiency Error',
-                       'filter efficiency error']:
+        elif field in ['filter efficiency error']:
             if list[10] > -1:
                 exitDuplicateField(file_in_, "Filter efficiency error")
             list[10] = ind
-        elif field in ['Match efficiency', 'Match Efficiency',
-                       'match efficiency']:
+        elif field in ['match efficiency']:
             if list[11] > -1:
                 exitDuplicateField(file_in_, "Match efficiency")
             list[11] = ind
-        elif field in ['Match efficiency error', 'Match Efficiency Error',
-                       'match efficiency error']:
+        elif field in ['match efficiency error']:
             if list[12] > -1:
                 exitDuplicateField(file_in_, "Match efficiency error")
             list[12] = ind
-        elif field in ['PWG', 'pwg']:
+        elif field in ['pwg']:
             if list[13] > -1:
                 exitDuplicateField(file_in_, "PWG")
             list[13] = ind
-        elif field in ['Campaign', 'campaign', 'Member of Campaign',
-                       'Member of campaign', 'member of campaign']:
+        elif field in ['campaign', 'member of campaign']:
             if list[14] > -1:
                 exitDuplicateField(file_in_, "Member of campaign")
             list[14] = ind
-        elif field in ['PrepId', 'PrepID', 'PREPID', 'prepid']:
+        elif field in ['prepid']:
             if list[15] > -1:
-                exitDuplicateField(file_in_, "PrepId")
+                exitDuplicateField(file_in_, "PrepID")
             list[15] = ind
-        elif field in ['Sequences customise', 'Sequences customize']:
+        elif field in ['sequences customise', 'sequences customize']:
             if list[16] > -1:
                 exitDuplicateField(file_in_, "Sequences customise")
             list[16] = ind
-        elif field in ['Process string', 'Process String']:
+        elif field in ['process string']:
             if list[17] > -1:
                 exitDuplicateField(file_in_, "Process string")
             list[17] = ind
-        elif field in ['Gridpack location', 'Gridpack']:
+        elif field in ['gridpack location', 'gridpack']:
             if list[18] > -1:
                 exitDuplicateField(file_in_, "Gridpack location")
             list[18] = ind
-        elif field in ['Gridpack cards URL', 'Cards URL',
-                       'Gridpack cards location', 'Cards location']:
+        elif field in ['gridpack cards url', 'cards url',
+                       'gridpack cards location', 'cards location']:
             if list[19] > -1:
                 exitDuplicateField(file_in_, "Gridpack cards URL")
             list[19] = ind
-        elif field in ['JobId']:
+        elif field in ['jobid']:
             if list[20] > -1:
                 exitDuplicateField(file_in_, "JobId")
             list[20] = ind
-        elif field in ['Local gridpack location', 'Local LHE', 'LHE']:
+        elif field in ['notes']:
+            if list[21] > -1:
+                exitDuplicateField(file_in_, "Notes")
+            list[21] = ind
+        elif field in ['mcm tag', 'mcm tags']:
+            if list[22] > -1:
+                exitDuplicateField(file_in_, "McM tags")
+            list[22] = ind
+        elif field in ['sequences beamspot']:
+            if list[23] > -1:
+                exitDuplicateField(file_in_, "Sequences beamspot")
+            list[23] = ind
+        elif field in ['sequences magField']:
+            if list[24] > -1:
+                exitDuplicateField(file_in_, "Sequences magField")
+            list[24] = ind
+        elif field in ['local gridpack location', 'Local lhe', 'lhe']:
             continue
         else:
             print "Error: The field {0} is not valid.".format(field)
@@ -323,6 +326,14 @@ def fillFields(csvfile, fields):
                 tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], ""))
         if fields[20] > -1:
             tmpReq.setJobID(row[fields[20]])
+        if fields[21] > -1:
+            tmpReq.setNotes(row[fields[21]])
+        if fields[22] > -1:
+            tmpReq.setMcMTag(row[fields[22]].split(" "))
+        if fields[23] > -1:
+            tmpReq.setSequencesBeamspot(row[fields[23]])
+        if fields[24] > -1:
+            tmpReq.setSequencesMagField(row[fields[24]])
         requests.append(tmpReq)
     return requests, num_requests
 
