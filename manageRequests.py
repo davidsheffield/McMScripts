@@ -239,6 +239,8 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_, McMTags):
     requests = [] # List containing request objects
     num_requests = 0
     for row in csv.reader(csvfile):
+        if row[0].startswith("#"):
+            continue
         num_requests += 1
         tmpReq = Request()
         if fields[0] > -1:
