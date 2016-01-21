@@ -28,6 +28,8 @@ class Request:
         self.useCamp_               = False
         self.usePrepId_             = False
         self.useSequencesCustomise_ = False
+        self.useSequencesBeamspot_  = False
+        self.useSequencesMagField_  = False
         self.useProcessString_      = False
         self.useJobID_              = False
         self.useNotes_              = False
@@ -87,6 +89,12 @@ class Request:
     def setSequencesCustomise(self,x):
         self.SequencesCustomise_ = x
         self.useSequencesCustomise_ = True
+    def setSequencesBeamspot(self,x):
+        self.SequencesBeamspot_ = x
+        self.useSequencesBeamspot_ = True
+    def setSequencesMagField(self,x):
+        self.SequencesMagField_ = x
+        self.useSequencesMagField_ = True
     def setProcessString(self,x):
         self.ProcessString_ = x
         self.useProcessString_ = True
@@ -136,6 +144,10 @@ class Request:
         return self.PrepId_
     def getSequencesCustomise(self):
         return self.SequencesCustomise_
+    def getSequencesBeamspot(self):
+        return self.SequencesBeamspot_
+    def getSequencesMagField(self):
+        return self.SequencesMagField_
     def getProcessString(self):
         return self.ProcessString_
     def getJobID(self):
@@ -181,6 +193,10 @@ class Request:
         return self.usePrepId_
     def useSequencesCustomise(self):
         return self.useSequencesCustomise_
+    def useSequencesBeamspot(self):
+        return self.useSequencesBeamspot_
+    def useSequencesMagField(self):
+        return self.useSequencesMagField_
     def useProcessString(self):
         return self.useProcessString_
     def useJobID(self):

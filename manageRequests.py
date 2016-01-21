@@ -88,7 +88,7 @@ def exitDuplicateField(file_in_, field_):
 def getFields(csvfile_, file_in_):
     # List of indices for each field in CSV file
     list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-             -1, -1, -1, -1, -1]
+             -1, -1, -1, -1, -1, -1, -1]
     header = csv.reader(csvfile_).next()
     for ind, field in enumerate(header):
         if field in ['Dataset name', 'Dataset Name', 'Dataset', 'dataset']:
@@ -198,6 +198,14 @@ def getFields(csvfile_, file_in_):
             if list[21] > -1:
                 exitDuplicateField(file_in_, "McM tags")
             list[21] = ind
+        elif field in ['Sequences beamspot']:
+            if list[22] > -1:
+                exitDuplicateField(file_in_, "Sequences beamspot")
+            list[22] = ind
+        elif field in ['Sequences magField']:
+            if list[23] > -1:
+                exitDuplicateField(file_in_, "Sequences magField")
+            list[23] = ind
         elif field in ['JobId', 'Local gridpack location', 'Local LHE', 'LHE']:
             continue
         else:
@@ -311,6 +319,10 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_, McMTags):
             tmpReq.setMcMTag(row[fields[21]].split(" "))
         elif McMTags is not None:
             tmpReq.setMcMTag(McMTags)
+        if fields[22] > -1:
+            tmpReq.setSequencesBeamspot(row[fields[22]])
+        if fields[23] > -1:
+            tmpReq.setSequencesMagField(row[fields[23]])
         requests.append(tmpReq)
     return requests, num_requests
 
@@ -349,9 +361,6 @@ def createRequests(requests, num_requests, doDryRun, useDev):
             new_req['size_event'] = reqFields.getSize()
         if reqFields.useGen():
             new_req['generators'] = reqFields.getGen()
-        # Sequences might need to be added below with generator parameters
-        if reqFields.useSequencesCustomise():
-            new_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
         if reqFields.useProcessString():
             new_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
@@ -377,7 +386,13 @@ def createRequests(requests, num_requests, doDryRun, useDev):
                     = reqFields.getMatchEff()
                 mod_req['generator_parameters'][0]['match_efficiency_error'] \
                     = reqFields.getMatchEffErr()
-                # Update request with generator parameters
+                if reqFields.useSequencesCustomise():
+                    mod_req['sequences'][0]['customise'] = reqFields.getSequencesCustomise()
+                if reqFields.useSequencesBeamspot():
+                    mod_req['sequences'][0]['beamspot'] = reqFields.getSequencesBeamspot()
+                if reqFields.useSequencesMagField():
+                    mod_req['sequences'][0]['magField'] = reqFields.getSequencesMagField()
+                # Update request with generator parameters and sequences
                 update_answer = mcm.updateA('requests', mod_req)
                 if update_answer['results']:
                     print "\033[0;32m{0} created\033[0;m".format(answer['prepid'])
@@ -491,6 +506,10 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
         if reqFields.useSequencesCustomise():
             mod_req['sequences'][0]['customise'] \
                 = reqFields.getSequencesCustomise()
+        if reqFields.useSequencesBeamspot():
+            mod_req['sequences'][0]['beamspot'] = reqFields.getSequencesBeamspot()
+        if reqFields.useSequencesMagField():
+            mod_req['sequences'][0]['magField'] = reqFields.getSequencesMagField()
         if reqFields.useProcessString():
             mod_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
@@ -572,6 +591,10 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
         if reqFields.useSequencesCustomise():
             clone_req['sequences'][0]['customise'] \
                 = reqFields.getSequencesCustomise()
+        if reqFields.useSequencesBeamspot():
+            clone_req['sequences'][0]['beamspot'] = reqFields.getSequencesBeamspot()
+        if reqFields.useSequencesMagField():
+            clone_req['sequences'][0]['magField'] = reqFields.getSequencesMagField()
         if reqFields.useProcessString():
             clone_req['process_string'] = reqFields.getProcessString()
         if reqFields.useNotes():
