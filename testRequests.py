@@ -157,7 +157,7 @@ def exitDuplicateField(file_in_,field_):
 def getFields(csvfile):
     # List of indices for each field in CSV file
     list = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-             -1, -1, -1, -1]
+             -1, -1, -1, -1, -1, -1, -1, -1]
     header = csv.reader(csvfile).next()
     for ind, field in enumerate(header):
         field = field.lower()
