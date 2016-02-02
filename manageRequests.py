@@ -189,7 +189,7 @@ def getFields(csvfile_, file_in_):
             if list[22] > -1:
                 exitDuplicateField(file_in_, "Sequences beamspot")
             list[22] = ind
-        elif field in ['sequences magField']:
+        elif field in ['sequences magfield']:
             if list[23] > -1:
                 exitDuplicateField(file_in_, "Sequences magField")
             list[23] = ind
