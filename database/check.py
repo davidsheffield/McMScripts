@@ -77,7 +77,7 @@ def getRequestSets():
             for j in range(len(statuses[0])):
                 c.execute('UPDATE RequestSets SET {0} = {1} WHERE SetID = {2}'.format(
                         status_name[i][j], statuses[i][j], request[0]))
-        time.sleep(0.5)
+        time.sleep(1)
     conn.commit()
     conn.close()
 
