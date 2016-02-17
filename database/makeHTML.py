@@ -54,7 +54,7 @@ def makeAnalyzerHTML():
     <th>LHE</th>
     <th>GS</th>
     <th>DR</th>
-    <th>MiniAOD</th>
+    <th>MiniAODv1</th>
     <th>MiniAODv2</th>
 </tr>
 """)
@@ -72,11 +72,8 @@ def makeAnalyzerHTML():
     <td>{0}</td>
 """.format(request[1]))
         for i in range(len(status_name)):
-            fout.write("    <td><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=137438955551\">".format(
-                    request[4], campaigns[i]))
-            for j in range(len(status_name[0])):
-                fout.write("{0} ".format(request[10 + j + 7*i]))
-            fout.write("</a></td>\n")
+            fout.write("    <td><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=137438955551\">{2}/{3} done</a></td>\n".format(
+                    request[4], campaigns[i], request[16 + 7*i], request[9]))
         fout.write("</tr>\n")
     conn.close()
 
