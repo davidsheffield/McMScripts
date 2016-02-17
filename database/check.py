@@ -55,21 +55,22 @@ def getRequestSets():
                 request[1]))
         statuses = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
         for req in req_list:
-            if req['member_of_campaign'] == GS_campaign:
-                if req['approval'] == "none" and req['status'] == "new":
-                    statuses[1][0] += 1
-                if req['approval'] == "validation" and req['status'] == "new":
-                    statuses[1][1] += 1
-                if req['approval'] == "validation" and req['status'] == "validation":
-                    statuses[1][2] += 1
-                if req['approval'] == "define" and req['status'] == "defined":
-                    statuses[1][3] += 1
-                if req['approval'] == "approve" and req['status'] == "approved":
-                    statuses[1][4] += 1
-                if req['approval'] == "submit" and req['status'] == "submitted":
-                    statuses[1][5] += 1
-                if req['approval'] == "submit" and req['status'] == "done":
-                    statuses[1][6] += 1
+            for i in range(len(campaigns)):
+                if req['member_of_campaign'] == campaigns[i]:
+                    if req['approval'] == "none" and req['status'] == "new":
+                        statuses[i][0] += 1
+                    elif req['approval'] == "validation" and req['status'] == "new":
+                        statuses[i][1] += 1
+                    elif req['approval'] == "validation" and req['status'] == "validation":
+                        statuses[i][2] += 1
+                    elif req['approval'] == "define" and req['status'] == "defined":
+                        statuses[i][3] += 1
+                    elif req['approval'] == "approve" and req['status'] == "approved":
+                        statuses[i][4] += 1
+                    elif req['approval'] == "submit" and req['status'] == "submitted":
+                        statuses[i][5] += 1
+                    elif req['approval'] == "submit" and req['status'] == "done":
+                        statuses[i][6] += 1
         #print statuses
         #print request[0]
         for i in range(len(statuses)):
