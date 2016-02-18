@@ -74,7 +74,7 @@ def parseIDList(compactList):
 def modifyRequest(mcm, req, tag):
     for existing in req['tags']:
         if existing.startswith("EXO"):
-            print "  \033[0;33m{0} has already tagged with {1}\033[0;m".format(req['prepid'], existing)
+            print "  \033[0;33m{0} has already been tagged with {1}\033[0;m".format(req['prepid'], existing)
             return
     req['tags'] += [tag]
     answer = mcm.updateA('requests', req) # Update request
@@ -90,10 +90,14 @@ def tagRequests(prepids, tag):
     campaigns = ['RunIISummer15GS', 'RunIIFall15DR76', 'RunIIFall15MiniAODv1',
                  'RunIIFall15MiniAODv2']
 
+    num = len(prepids)
+    counter = 0
+
     for prepid in prepids:
+        counter += 1
         time.sleep(1.0)
         req = mcm.getA('requests', prepid)
-        print "{0} {1}".format(prepid, req['dataset_name'])
+        print "{0}/{1} {2} {3}".format(counter, num, prepid, req['dataset_name'])
         if req['member_of_campaign'] == "RunIIWinter15wmLHE"\
                 or req['member_of_campaign'] == "RunIIWinter15pLHE":
             modifyRequest(mcm, req, tag)
