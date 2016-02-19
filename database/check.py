@@ -21,7 +21,7 @@ import time
 def getRequestSets():
     mcm = restful(dev=False)
 
-    wmLHE_campagin  = "RunIIWinter15wmLHE"
+    wmLHE_campaign  = "RunIIWinter15wmLHE"
     pLHE_campaign   = "RunIIWinter15pLHE"
     GS_campaign     = "RunIISummer15GS"
     DR_campaign     = "RunIIFall15DR76"
@@ -50,7 +50,7 @@ def getRequestSets():
     for request in out:
         print request[1]
 
-        campaigns = ["", GS_campaign, DR_campaign, Mini_campaign, Miniv2_campaign]
+        campaigns = [wmLHE_campaign, GS_campaign, DR_campaign, Mini_campaign, Miniv2_campaign]
         req_list = mcm.getA('requests', query='tags={0}'.format(
                 request[1]))
         statuses = [[0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0]]
