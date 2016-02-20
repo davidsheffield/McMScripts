@@ -1,0 +1,60 @@
+/*************************
+**
+** Global CSS for Exotica MC Status
+**
+**
+*************************/
+
+body {
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    font-family: Helvetica, Ariel, sans-serif;
+}
+
+div.wrapper {
+    margin: 20px 50px 20px 50px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background: #ffffff;
+}
+
+tr:nth-child(odd) {
+    background: #dddddd;
+}
+
+tr.table_header {
+    background-color: #999999;
+    border-bottom: 2px solid black;
+    text-color: #ffffff;
+}
+
+th {
+    padding: 2px;
+}
+
+td {
+    padding: 2px;
+}
+
+th.lhe, th.gs, th.dr, th.miniaod, th.miniaodv2 {
+    width: 125px;
+}
+
+td.lhe, td.gs, td.dr, td.miniaod, td.miniaodv2 {
+    text-align: center;
+}
