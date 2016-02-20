@@ -12,10 +12,13 @@
 
 import sqlite3
 import argparse
+import sys
+sys.path.append('../')
+import mcmscripts_config
 
 
 def makeAnalyzerHTML():
-    fout = open('analyzer.html', 'w')
+    fout = open('{0}analyzer.html'.format(mcmscripts_config.html_location), 'w')
     status_name = [["LHE_New", "LHE_Validating", "LHE_Validated", "LHE_Defined",
                     "LHE_Approved", "LHE_Submitted", "LHE_Done"],
                    ["GS_New", "GS_Validating", "GS_Validated", "GS_Defined",
@@ -65,7 +68,8 @@ def makeAnalyzerHTML():
 </tr>
 """)
 
-    conn = sqlite3.connect('EXO_MC_Requests.db')
+    conn = sqlite3.connect(mcmscripts_config.database_location)
+
     c = conn.cursor()
     c.execute('SELECT Process, Tag, RequestMultiplicity, LHE_Done, GS_Done, DR_Done, MiniAOD_Done, MiniAODv2_Done, RequesterID FROM RequestSets;')
     out = c.fetchall()
@@ -97,6 +101,7 @@ def makeAnalyzerHTML():
     print "Generated analyzer page"
 
     return
+
 
 def main():
     makeAnalyzerHTML()

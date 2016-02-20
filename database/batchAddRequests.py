@@ -17,6 +17,8 @@ import csv
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import *
 import time
+sys.path.append('../')
+import mcmscripts_config
 
 
 def addRequestSet(answers, mcm):
@@ -26,7 +28,7 @@ def addRequestSet(answers, mcm):
     events = 0
     for req in req_list:
         events += req['total_events']
-    conn = sqlite3.connect('EXO_MC_Requests.db')
+    conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
     c.execute('INSERT INTO RequestSets (Process, Tag, Events, Notes, Spreadsheet, RequestMultiplicity) VALUES ("{0}", "{1}", {2}, "{3}", "{4}", {5});'.format(
             answers[0], answers[1], events, answers[6], answers[5], multiplicity))

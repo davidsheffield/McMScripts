@@ -16,6 +16,8 @@ import sys
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import *
 import time
+sys.path.append('../')
+import mcmscripts_config
 
 
 def getRequestSets():
@@ -41,7 +43,7 @@ def getRequestSets():
                     "MiniAODv2_Approved", "MiniAODv2_Submitted",
                     "MiniAODv2_Done"]]
 
-    conn = sqlite3.connect('EXO_MC_Requests.db')
+    conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
     c.execute('SELECT SetID, Tag FROM RequestSets')
     out = c.fetchall()

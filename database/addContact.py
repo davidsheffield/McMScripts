@@ -11,6 +11,9 @@
 ################################
 
 import sqlite3
+import sys
+sys.path.append('../')
+import mcmscripts_config
 
 
 def interrogate():
@@ -35,7 +38,7 @@ def interrogate():
 
 
 def addContact(answers):
-    conn = sqlite3.connect('EXO_MC_Requests.db')
+    conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
     c.execute('INSERT INTO Contacts VALUES (Null, "{0}", "{1}", "{2}", "{3}");'.format(
             answers[0], answers[1], answers[2], answers[3]))

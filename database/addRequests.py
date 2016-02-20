@@ -15,6 +15,8 @@ import argparse
 import sys
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import *
+sys.path.append('../')
+import mcmscripts_config
 
 
 def interrogate():
@@ -47,7 +49,7 @@ def addRequestSet(answers):
     req_list = mcm.getA('requests', query='tags={0}&member_of_campaign={1}'.format(
             answers[3], answers[7]))
     multiplicity = len(req_list)
-    conn = sqlite3.connect('EXO_MC_Requests.db')
+    conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
     c.execute('INSERT INTO RequestSets (Process, Tag, Events, Notes, Spreadsheet, RequestMultiplicity) VALUES ("{0}", "{1}", {2}, "{3}", "{4}", {5});'.format(
             answers[0], answers[3], answers[4], answers[5], answers[6], multiplicity))
