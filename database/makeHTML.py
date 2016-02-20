@@ -12,7 +12,6 @@
 
 import sqlite3
 import argparse
-#from __future__ import print_function
 
 
 def makeAnalyzerHTML():
@@ -32,6 +31,7 @@ def makeAnalyzerHTML():
                     "MiniAODv2_Done"]]
     campaigns = ["RunIIWinter15*LHE", "RunIISummer15GS", "RunIIFall15DR76",
                  "RunIIFall15MiniAODv1", "RunIIFall15MiniAODv2"]
+    campaign_classes = ["lhe", "gs", "dr", "miniaod", "miniaodv2"]
 
     fout.write("""\
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -48,41 +48,53 @@ def makeAnalyzerHTML():
 
 <body>
 
+<div class="wrapper">
+<h1>Exotica MC</h1>
+
+<h2 class="campaign">7_6_X Campaign</h2>
+<p>(RunIIWinter15wmLHE/RunIIWinter15pLHE &rarr;) RunIISummer15GS &rarr; RunIIFall15DR &rarr; RunIIFall15MiniAODv1 &rarr; RunIIFall15MiniAODv2</p>
 <table>
 <tr class="table_header">
-    <th>Process</th>
-    <th>LHE</th>
-    <th>GS</th>
-    <th>DR</th>
-    <th>MiniAODv1</th>
-    <th>MiniAODv2</th>
+    <th class="process">Process</th>
+    <th class="requester">Requester</th>
+    <th class="lhe">LHE</th>
+    <th class="gs">GS</th>
+    <th class="dr">DR</th>
+    <th class="miniaod">MiniAODv1</th>
+    <th class="miniaodv2">MiniAODv2</th>
 </tr>
 """)
 
     conn = sqlite3.connect('EXO_MC_Requests.db')
     c = conn.cursor()
-    c.execute('SELECT * FROM RequestSets;')
+    c.execute('SELECT Process, Tag, RequestMultiplicity, LHE_Done, GS_Done, DR_Done, MiniAOD_Done, MiniAODv2_Done, RequesterID FROM RequestSets;')
     out = c.fetchall()
 
-    print "Filling:"
     for request in out:
-        print request[4]
+        c.execute('SELECT Name, Email FROM Requesters WHERE RequesterID = {0};'.format(
+                request[8]))
+        requester = c.fetchall()
         fout.write("""\
 <tr>
-    <td>{0}</td>
-""".format(request[1]))
+    <td class="process">{0}</td>
+    <td class="requester"><a href="mailto:{1}">{2}</a></td>
+""".format(request[0], requester[0][1], requester[0][0]))
         for i in range(len(status_name)):
-            fout.write("    <td><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=137438955551\">{2}/{3} done</a></td>\n".format(
-                    request[4], campaigns[i], request[16 + 7*i], request[9]))
+            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1&shown=137438955551\" class=\"status\">{3}/{4} done</a></td>\n".format(
+                    campaign_classes[i], request[1], campaigns[i], request[3 + i], request[2]))
         fout.write("</tr>\n")
     conn.close()
 
     fout.write("""\
 </table>
+</div>
+
 </body>
 </html>
 """)
     fout.close()
+
+    print "Generated analyzer page"
 
     return
 
