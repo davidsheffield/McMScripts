@@ -20,6 +20,20 @@ sys.path.append('../')
 import mcmscripts_config
 
 
+def getArguments():
+    parser = argparse.ArgumentParser(
+        description='Check status of requests in McM and save in database.')
+
+    # Command line flags
+    parser.add_argument('--check', action='store', dest='check',
+                        help='Type of check to perform. 0 Check all sets, 1 Check sets that are not finished, 2 Check requests being validated.')
+    parser.add_argument('-t', '--tag', action='store', dest='tag',
+                        help='Check status of requests based on tag.')
+
+    args_ = parser.parse_args()
+    return args_
+
+
 def getRequestSets():
     mcm = restful(dev=False)
 
@@ -45,7 +59,7 @@ def getRequestSets():
 
     conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
-    c.execute('SELECT SetID, Tag FROM RequestSets')
+    c.execute('SELECT SetID, Tag FROM RequestSets WHERE RequestMultiplicity != MiniAODv2_Done')
     out = c.fetchall()
 
     print "Checking:"
@@ -86,6 +100,7 @@ def getRequestSets():
     return
 
 def main():
+    args = getArguments() # Setup flags and get arguments
     getRequestSets()
 
     return
