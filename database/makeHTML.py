@@ -13,8 +13,19 @@
 import sqlite3
 import argparse
 import sys
+import math
 sys.path.append('../')
 import mcmscripts_config
+
+
+def display_number(n):
+    if n == 0:
+        return "0"
+    else:
+        prefix = ['', 'k', 'M']
+        n = float(n)
+        prefix_id = max(0, min(2, int(math.floor(math.log10(abs(n))/3.0))))
+        return "{0:.5g}{1}".format(n/10**(3*prefix_id), prefix[prefix_id]);
 
 
 def makeAnalyzerHTML():
@@ -84,7 +95,7 @@ def makeAnalyzerHTML():
     <td class="requester"><a href="mailto:{1}">{2}</a></td>
 """.format(request[0], requester[0][1], requester[0][0]))
         for i in range(len(status_name)):
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1&shown=137438955551\" class=\"status\">{3}/{4} done</a></td>\n".format(
+            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4} done</a></td>\n".format(
                     campaign_classes[i], request[1], campaigns[i], request[3 + i], request[2]))
         fout.write("</tr>\n")
     conn.close()
@@ -185,9 +196,10 @@ def makeContactHTML():
     <td class="requester"><a href="mailto:{2}">{3}</a></td>
     <td class="contact">{4}</td>
     <td class="events">{5}</td>
-""".format(request[0], request[3], requester[0][1], requester[0][0], contact[0][0], request[4]))
+""".format(request[0], request[3], requester[0][1], requester[0][0], contact[0][0],
+           display_number(request[4])))
         for i in range(len(status_name)):
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1&shown=240518170655\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a></td>\n".format(
+            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a></td>\n".format(
                     campaign_classes[i], request[3], campaigns[i],
                     request[8 + i*7], request[9 + i*7], request[10 + i*7],
                     request[11 + i*7], request[12 + i*7], request[13 + i*7],
