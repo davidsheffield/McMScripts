@@ -204,10 +204,14 @@ def makeContactHTML():
                     request[8 + i*7], request[9 + i*7], request[10 + i*7],
                     request[11 + i*7], request[12 + i*7], request[13 + i*7],
                     request[14 + i*7], request[7]))
+        if request[6] == "":
+            fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
+        else:
+            fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\">X</a></td>".format(
+                    request[6]))
         fout.write("""\
-    <td class="spreadsheet"><a href="{0}">X</a></td>
-    <td class="notes">{1}</td>
-</tr>\n""".format(request[6], request[5]))
+    <td class="notes">{0}</td>
+</tr>\n""".format(request[5]))
     conn.close()
 
     fout.write("""\
