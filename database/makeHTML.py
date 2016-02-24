@@ -56,6 +56,7 @@ def makeAnalyzerHTML():
     <title>Exotica MC Status for Analyzers</title>
 
     <link rel="stylesheet" type="text/css" href="global.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 </head>
@@ -142,6 +143,7 @@ def makeContactHTML():
     <title>Exotica MC Status for Contacts</title>
 
     <link rel="stylesheet" type="text/css" href="global.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 </head>
