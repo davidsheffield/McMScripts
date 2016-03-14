@@ -14,6 +14,7 @@ import sqlite3
 import argparse
 import sys
 import math
+import time
 sys.path.append('../')
 import mcmscripts_config
 
@@ -103,11 +104,12 @@ def makeAnalyzerHTML():
 
     fout.write("""\
 </table>
+<p class="update-time">Updated {0}</p>
 </div>
 
 </body>
 </html>
-""")
+""".format(time.asctime()))
     fout.close()
 
     print "Generated analyzer page"
@@ -218,11 +220,12 @@ def makeContactHTML():
 
     fout.write("""\
 </table>
+<p class="update-time">Updated {0}</p>
 </div>
 
 </body>
 </html>
-""")
+""".format(time.asctime()))
     fout.close()
 
     print "Generated contact page"
