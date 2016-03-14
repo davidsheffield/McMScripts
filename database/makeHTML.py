@@ -157,6 +157,7 @@ def makeContactHTML():
 
 <h2 class="campaign">7_6_X Campaign</h2>
 <p>(RunIIWinter15wmLHE/RunIIWinter15pLHE &rarr;) RunIISummer15GS &rarr; RunIIFall15DR &rarr; RunIIFall15MiniAODv1 &rarr; RunIIFall15MiniAODv2</p>
+<table style="margin:1em;border:1px black solid;"><tbody><tr style="background-color:#ffffff"><td>Key:</td><td class="gs" style="width:3em">1<br>2<br>3<br>4<br>5<br>6<br>7/28</td><td class="gs">new<br>validating<br>validated<br>defined<br>approved<br>submitted<br>done/total</td></tr></tbody></table>
 <table>
 <tr class="table_header">
     <th class="process">Process</th>
