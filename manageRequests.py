@@ -16,6 +16,7 @@ import argparse
 import csv
 import pprint
 import time
+import urllib2
 import mcmscripts_config
 sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import * # Load class to access McM
@@ -210,13 +211,13 @@ def formatFragment(file_, campaign_):
     # 13 TeV campaigns
     elif campaign_ in ['Fall13', 'RunIIFall14GS', 'RunIIWinter15GS',
                        'RunIIWinter15wmLHE', 'RunIIWinter15pLHE',
-                       'RunIISummer15GS']:
+                       'RunIISummer15GS', 'RunIISummer15wmLHEGS']:
         return "Configuration/GenProduction/python/ThirteenTeV/"+file_
     else:
         print "Error: Cannot determine energy of campaign {0}.".format(campaign_)
         sys.exit(5)
 
-def createLHEProducer(gridpack, cards):
+def createLHEProducer(gridpack, cards, fragment, tag):
     code = """import FWCore.ParameterSet.Config as cms
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
@@ -233,6 +234,18 @@ externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
 # Link to cards:
 # {0}
 """.format(cards)
+
+    if fragment != "" and tag != "":
+        gen_fragment_url = "https://raw.githubusercontent.com/cms-sw/genproductions/{0}/{1}".format(
+            tag, fragment.split("Configuration/GenProduction/")[1])
+        gen_fragment = urllib2.urlopen(gen_fragment_url).read()
+        code += """
+{0}
+
+# Link to generator fragment:
+# {1}
+""".format(gen_fragment, gen_fragment_url)
+
     return code
 
 def fillFields(csvfile, fields, campaign, PWG, notCreate_, McMTags):
@@ -298,10 +311,16 @@ def fillFields(csvfile, fields, campaign, PWG, notCreate_, McMTags):
             tmpReq.setProcessString(row[fields[17]])
         if fields[18] > -1:
             if fields[19] > -1:
-                tmpReq.setMcMFrag(createLHEProducer(row[fields[18]],
-                                                    row[fields[19]]))
+                if fields[4] > -1 and fields[7]:
+                    tmpReq.setMcMFrag(createLHEProducer(row[fields[18]],
+                                                        row[fields[19]],
+                                                        formatFragment(row[fields[4]], campaign),
+                                                        row[fields[7]]))
+                else:
+                    tmpReq.setMcMFrag(createLHEProducer(row[fields[18]],
+                                                        row[fields[19]], "", ""))
             else:
-                tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], ""))
+                tmpReq.setMcMFrag(createLHEProducer(row[fields[18]], "", "", ""))
         if fields[20] > -1:
             tmpReq.setNotes(row[fields[20]])
         if fields[21] > -1:
@@ -338,12 +357,13 @@ def createRequests(requests, num_requests, doDryRun, useDev):
             new_req['dataset_name'] = reqFields.getDataSetName()
         if reqFields.useEvts():
             new_req['total_events'] = reqFields.getEvts()
-        if reqFields.useFrag():
-            new_req['name_of_fragment'] = reqFields.getFrag()
-        if reqFields.useTag():
-            new_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useMcMFrag():
             new_req['fragment'] = reqFields.getMcMFrag()
+        else:
+            if reqFields.useFrag():
+                new_req['name_of_fragment'] = reqFields.getFrag()
+            if reqFields.useTag():
+                new_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useTime():
             new_req['time_event'] = reqFields.getTime()
         if reqFields.useSize():
@@ -456,12 +476,13 @@ def modifyRequests(requests, num_requests, doDryRun, useDev, isLHErequest):
             mod_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts():
             mod_req['total_events'] = reqFields.getEvts()
-        if reqFields.useFrag():
-            mod_req['name_of_fragment'] = reqFields.getFrag()
-        if reqFields.useTag():
-            mod_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useMcMFrag():
             mod_req['fragment'] = reqFields.getMcMFrag()
+        else:
+            if reqFields.useFrag():
+                mod_req['name_of_fragment'] = reqFields.getFrag()
+            if reqFields.useTag():
+                mod_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useTime():
             mod_req['time_event'] = reqFields.getTime()
         if reqFields.useSize():
@@ -550,12 +571,13 @@ def cloneRequests(requests, num_requests, doDryRun, useDev, cloneId_):
             clone_req['mcdb_id'] = reqFields.getMCDBID()
         if reqFields.useEvts():
             clone_req['total_events'] = reqFields.getEvts()
-        if reqFields.useFrag():
-            clone_req['name_of_fragment'] = reqFields.getFrag()
-        if reqFields.useTag():
-            clone_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useMcMFrag():
             clone_req['fragment'] = reqFields.getMcMFrag()
+        else:
+            if reqFields.useFrag():
+                clone_req['name_of_fragment'] = reqFields.getFrag()
+            if reqFields.useTag():
+                clone_req['fragment_tag'] = reqFields.getTag()
         if reqFields.useTime():
             clone_req['time_event'] = reqFields.getTime()
         if reqFields.useSize():
