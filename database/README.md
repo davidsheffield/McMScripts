@@ -3,10 +3,12 @@ Database
 
 This is a database to track sets of requests in McM.
 
+[View database model](database_model.svg)
+
 Schema
 ------
 
-'''
+```
 CREATE TABLE RequestSets(
     SetID INTEGER PRIMARY KEY,
     Process TEXT,
@@ -73,6 +75,4 @@ CREATE TABLE CampaignChain_Campaign(
     PRIMARY KEY(CampaignChainID, CampaignID),
     FOREIGN KEY(CampaignChainID) REFERENCES CampaignChains(CampaignChainID),
     FOREIGN KEY(CampaignID) REFERENCES Campaigns(CampaignID));
-'''
-
-![database model](database_model.svg?raw=true "database model")
+```
