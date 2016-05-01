@@ -2,9 +2,9 @@
 
 ################################
 #
-# addRequests.py
+# newInstance.py
 #
-#  Script to add requests to database
+#  Script to add new instance of requests to database
 #
 #  author: David G. Sheffield (Rutgers)
 #
@@ -22,15 +22,7 @@ import mcmscripts_config
 def Interrogate():
     loop = True
     while loop:
-        process = raw_input("Process: ")
-        requester = raw_input("Requester name: ")
-        email = raw_input("Requester email: ")
         tag = raw_input("Tag: ")
-        events = raw_input ("Events: ")
-        multiplicity = raw_input ("Number of requests: ")
-        note = raw_input("Notes: ")
-        spreadsheet = raw_input("Spreadsheet: ")
-        ticket = raw_input("Ticket: ")
         conn = sqlite3.connect(mcmscripts_config.database_location)
         c = conn.cursor()
         c.execute("""SELECT SuperCampaignID, Name FROM SuperCampaigns
@@ -57,8 +49,7 @@ WHERE SuperCampaignID = {0};""".format(super_campaign))
             else:
                 yn = raw_input('Please enter "yes" or "no". ')
 
-    return [process, requester, email, tag, events, multiplicity, note,
-            spreadsheet, ticket, super_campaign, campaign_chain]
+    return [tag, campaign_chain]
 
 
 def AddRequester(name_, email_):
@@ -97,21 +88,20 @@ WHERE Name = "{0}" OR Email = "{1}";""".format(name_, email_))
     return requester_id
 
 
-def AddRequestSet(answers_, requester_id_):
+def AddRequestSet(answers_):
     conn = sqlite3.connect(mcmscripts_config.database_location)
     c = conn.cursor()
-    c.execute("""INSERT INTO RequestSets (Process, Tag, Events,
-RequestMultiplicity, Notes, Spreadsheet, Ticket) VALUES ("{0}", "{1}", {2}, {3},
-"{4}", "{5}", "{6}");""".format(answers_[0], answers_[3], answers_[4], answers_[5],
-                                answers_[6], answers_[7], answers_[8]))
-    set_id = c.lastrowid
+    c.execute("""SELECT Instances.SetID, Instances.ContactID,
+Instances.RequesterID, Instances.PriorityBlock FROM Instances
+INNER JOIN RequestSets USING(SetID) WHERE Tag = "{0}";""".format(answers_[0]))
+    out = c.fetchall()
     c.execute("""INSERT INTO Instances (SetID, CampaignChainID, ContactID,
 RequesterID, PriorityBlock) VALUES ({0}, {1}, {2}, {3}, {4});""".format(
-            set_id, answers_[10], 1, requester_id_, 3))
+            out[0][0], answers_[1], out[0][1], out[0][2], out[0][3]))
     instance_id = c.lastrowid
     c.execute("""SELECT Campaigns.CampaignID FROM CampaignChains
 INNER JOIN CampaignChain_Campaign USING(CampaignChainID)
-INNER JOIN Campaigns USING(CampaignID) WHERE CampaignChainID = {0};""".format(answers_[10]))
+INNER JOIN Campaigns USING(CampaignID) WHERE CampaignChainID = {0};""".format(answers_[1]))
     out = c.fetchall()
     for campaign in out:
         c.execute("""INSERT INTO Requests (CampaignID, New, Validating,
@@ -129,8 +119,7 @@ VALUES ({0}, {1});""".format(instance_id, requests_id))
 
 def main():
     answers = Interrogate()
-    requester_id = GetRequester(answers[1], answers[2])
-    AddRequestSet(answers, requester_id)
+    AddRequestSet(answers)
 
     return
 

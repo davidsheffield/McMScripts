@@ -1,9 +1,78 @@
 Database
 ========
 
+This is a database to track sets of requests in McM.
+
 Schema
 ------
 
-CREATE TABLE RequestSets(SetID INTEGER PRIMARY KEY, Process TEXT, RequesterID INTEGER, ContactID INTEGER, Tag INTEGER, Events INTEGER, Notes TEXT, Spreadsheet TEXT, RequestType INTEGER, RequestMultiplicity INTEGER, LHE_New INTEGER, LHE_Validating INTEGER, LHE_Validated INTEGER, LHE_Defined INTEGER, LHE_Approved INTEGER, LHE_Submitted INTEGER, LHE_Done INTEGER, GS_New INTEGER, GS_Validating INTEGER, GS_Validated INTEGER, GS_Defined INTEGER, GS_Approved INTEGER, GS_Submitted INTEGER, GS_Done INTEGER, DR_New INTEGER, DR_Validating INTEGER, DR_Validated INTEGER, DR_Defined INTEGER, DR_Approved INTEGER, DR_Submitted INTEGER, DR_Done INTEGER, MiniAOD_New INTEGER, MiniAOD_Validating INTEGER, MiniAOD_Validated INTEGER, MiniAOD_Defined INTEGER, MiniAOD_Approved INTEGER, MiniAOD_Submitted INTEGER, MiniAOD_Done INTEGER, MiniAODv2_New INTEGER, MiniAODv2_Validating INTEGER, MiniAODv2_Validated INTEGER, MiniAODv2_Defined INTEGER, MiniAODv2_Approved INTEGER, MiniAODv2_Submitted INTEGER, MiniAODv2_Done INTEGER, FOREIGN KEY(ContactID) REFERENCES Contacts(ContactID), FOREIGN KEY(RequesterID) REFERENCES Requesters(RequesterID), FOREIGN KEY(RequestType) REFERENCES RequestTypes(RequestType));
-CREATE TABLE Contacts(ContactID INTEGER PRIMARY KEY, Name TEXT, Email TEXT, DisplayName TEXT, UserName TEXT);
-CREATE TABLE Requesters(RequesterID INTEGER PRIMARY KEY, Name TEXT, Email TEXT);
+'''
+CREATE TABLE RequestSets(
+    SetID INTEGER PRIMARY KEY,
+    Process TEXT,
+    Tag TEXT,
+    Events INTEGER,
+    RequestMultiplicity INTEGER,
+    Notes TEXT,
+    Spreadsheet TEXT,
+    Ticket TEXT);
+CREATE TABLE Contacts(
+    ContactID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Email TEXT,
+    DisplayName TEXT NOT NULL,
+    UserName TEXT);
+CREATE TABLE Requesters(
+    RequesterID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Email TEXT);
+CREATE TABLE Instances(
+    InstanceID INTEGER PRIMARY KEY,
+    SetID INTEGER,
+    CampaignChainID INTEGER,
+    ContactID INTEGER,
+    RequesterID INTEGER,
+    PriorityBlock INTEGER,
+    FOREIGN KEY(SetID) REFERENCES RequestSets(SetID),
+    FOREIGN KEY(CampaignChainID) REFERENCES CampaignChains(CampaignChainID),
+    FOREIGN KEY(ContactID) REFERENCES Contacts(ContactID),
+    FOREIGN KEY(RequesterID) REFERENCES Requesters(RequesterID));
+CREATE TABLE Requests(
+    RequestsID INTEGER PRIMARY KEY,
+    CampaignID INTEGER NOT NULL,
+    New INTEGER NOT NULL,
+    Validating INTEGER NOT NULL,
+    Validated INTEGER NOT NULL,
+    Defined INTEGER NOT NULL,
+    Approved INTEGER NOT NULL,
+    Submitted INTEGER NOT NULL,
+    FOREIGN KEY(CampaignID) REFERENCES Campaigns(CampaignID));
+CREATE TABLE Instance_Requests(
+    InstanceID INTEGER NOT NULL,
+    RequestsID INTEGER NOT NULL,
+    PRIMARY KEY(InstanceID, RequestsID)
+    FOREIGN KEY(InstanceID) REFERENCES Instances(InstanceID),
+    FOREIGN KEY(RequestsID) REFERENCES Requests(RequestsID));
+CREATE TABLE SuperCampaigns(
+    SuperCampaignID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Active INTEGER NOT NULL);
+CREATE TABLE CampaignChains(
+    CampaignChainID INTEGER PRIMARY KEY,
+    Name TEXT,
+    SuperCampaignID INTEGER NOT NULL,
+    FOREIGN KEY(SuperCampaignID) REFERENCES SuperCampaigns(SuperCampaignID));
+CREATE TABLE Campaigns(
+    CampaignID INTEGER PRIMARY KEY,
+    Name TEXT NOT NULL,
+    Level INTEGER NOT NULL);
+CREATE TABLE CampaignChain_Campaign(
+    CampaignChainID INTEGER NOT NULL,
+    CampaignID INTEGER NOT NULL,
+    OrderInChain INTEGER NOT NULL,
+    PRIMARY KEY(CampaignChainID, CampaignID),
+    FOREIGN KEY(CampaignChainID) REFERENCES CampaignChains(CampaignChainID),
+    FOREIGN KEY(CampaignID) REFERENCES Campaigns(CampaignID));
+'''
+
+![database model](database_model.svg?raw=true "database model")
