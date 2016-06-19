@@ -203,7 +203,7 @@ def getFields(csvfile_, file_in_):
     return list
 
 def formatFragment(file_, campaign_):
-    if len(file_.split("/")) > 1:
+    if len(file_.split("/")) > 2:
         return file_
     # 8TeV campaign
     elif campaign_ in ['Summer12']:

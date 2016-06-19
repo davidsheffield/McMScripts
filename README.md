@@ -34,11 +34,11 @@ Get cookies
 
 Some scripts require getting a CERN SSO cookie before using them. They can be obtained for the production instance of McM with
 
-`cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb --reprocess`
+`cern-get-sso-cookie -u https://cms-pdmv.cern.ch/mcm/ -o ~/private/prod-cookie.txt --krb`
 
 and for the dev/test instance with
 
-`cern-get-sso-cookie -u https://cms-pdmv-dev.cern.ch/mcm/ -o ~/private/dev-cookie.txt --krb --reprocess`
+`cern-get-sso-cookie -u https://cms-pdmv-dev.cern.ch/mcm/ -o ~/private/dev-cookie.txt --krb`
 
 Run these commands before setting up a CMSSW environment. If these to not work, try to run [getCookie.sh](getCookie.sh).
 
