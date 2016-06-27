@@ -143,6 +143,11 @@ USING(InstanceID) INNER JOIN RequestSets USING(SetID);""")
             c.execute("""UPDATE Requests SET {0} = {1} WHERE RequestsID = {2}""".format(
                     status_name, statuses[i], row[4]))
 
+    c.execute("""\
+UPDATE Settings
+SET Value = "{0}"
+WHERE SettingID = 1;""".format(time.asctime()))
+
     conn.commit()
     conn.close()
 

@@ -14,7 +14,6 @@ import sqlite3
 import argparse
 import sys
 import math
-import time
 sys.path.append('../')
 import mcmscripts_config
 
@@ -204,6 +203,11 @@ def makeAnalyzerHTML():
     c = conn.cursor()
     writeSuperCampaigns(1, fout, c)
 
+    c.execute("""\
+SELECT Value
+FROM Settings
+WHERE SettingID = 1""")
+    check_time = c.fetchone()
     fout.write("""\
 </table>
 <p class="update-time">Updated {0}</p>
@@ -211,7 +215,7 @@ def makeAnalyzerHTML():
 
 </body>
 </html>
-""".format(time.asctime()))
+""".format(check_time[0]))
     fout.close()
 
     print "Generated analyzer page"
@@ -251,6 +255,11 @@ def makeContactHTML():
     c = conn.cursor()
     writeSuperCampaigns(0, fout, c)
 
+    c.execute("""\
+SELECT Value
+FROM Settings
+WHERE SettingID = 1""")
+    check_time = c.fetchone()
     fout.write("""\
 </table>
 <p class="update-time">Updated {0}</p>
@@ -258,7 +267,7 @@ def makeContactHTML():
 
 </body>
 </html>
-""".format(time.asctime()))
+""".format(check_time[0]))
     fout.close()
 
     print "Generated contact page"

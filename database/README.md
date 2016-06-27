@@ -75,4 +75,8 @@ CREATE TABLE CampaignChain_Campaign(
     PRIMARY KEY(CampaignChainID, CampaignID),
     FOREIGN KEY(CampaignChainID) REFERENCES CampaignChains(CampaignChainID),
     FOREIGN KEY(CampaignID) REFERENCES Campaigns(CampaignID));
+CREATE TABLE Settings(
+    SettingID INTEGER PRIMARY KEY,
+    Value TEXT,
+    Description TEXT);
 ```
