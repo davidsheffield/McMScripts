@@ -99,9 +99,60 @@ def getRequestSets():
 
     return
 
+
+def checkRequests():
+    mcm = restful(dev=False)
+
+    conn = sqlite3.connect(mcmscripts_config.database_location)
+    c = conn.cursor()
+    c.execute("""SELECT DISTINCT Tag, RequestMultiplicity, Done, Campaigns.Name,
+RequestsID FROM Requests INNER JOIN Campaigns USING(CampaignID)
+INNER JOIN Instance_Requests USING(RequestsID) INNER JOIN Instances
+USING(InstanceID) INNER JOIN RequestSets USING(SetID);""")
+    out = c.fetchall()
+
+    status_names = ["New", "Validating", "Validated", "Defined", "Approved",
+                    "Submitted", "Done"]
+
+    for row in out:
+        if row[1] == row[2]:
+            continue
+        print "{0} {1}".format(row[0], row[3])
+        req_list = mcm.getA('requests',
+                            query='tags={0}&member_of_campaign={1}'.format(
+                            row[0], row[3]))
+        time.sleep(1)
+        statuses = [0, 0, 0, 0, 0, 0, 0]
+        for req in req_list:
+            if req['approval'] == "none" and req['status'] == "new":
+                statuses[0] += 1
+            elif req['approval'] == "validation" and req['status'] == "new":
+                statuses[1] += 1
+            elif req['approval'] == "validation" and req['status'] == "validation":
+                statuses[2] += 1
+            elif req['approval'] == "define" and req['status'] == "defined":
+                statuses[3] += 1
+            elif req['approval'] == "approve" and req['status'] == "approved":
+                statuses[4] += 1
+            elif req['approval'] == "submit" and req['status'] == "submitted":
+                statuses[5] += 1
+            elif req['approval'] == "submit" and req['status'] == "done":
+                statuses[6] += 1
+
+        for i, status_name in enumerate(status_names):
+            c.execute("""UPDATE Requests SET {0} = {1} WHERE RequestsID = {2}""".format(
+                    status_name, statuses[i], row[4]))
+
+    conn.commit()
+    conn.close()
+
+    return
+
+
 def main():
     args = getArguments() # Setup flags and get arguments
-    getRequestSets()
+    #getRequestSets()
+    checkRequests()
 
     return
 

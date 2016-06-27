@@ -31,21 +31,6 @@ def display_number(n):
 
 def makeAnalyzerHTML():
     fout = open('{0}analyzer.html'.format(mcmscripts_config.html_location), 'w')
-    status_name = [["LHE_New", "LHE_Validating", "LHE_Validated", "LHE_Defined",
-                    "LHE_Approved", "LHE_Submitted", "LHE_Done"],
-                   ["GS_New", "GS_Validating", "GS_Validated", "GS_Defined",
-                    "GS_Approved", "GS_Submitted", "GS_Done"],
-                   ["DR_New", "DR_Validating", "DR_Validated", "DR_Defined",
-                    "DR_Approved", "DR_Submitted", "DR_Done"],
-                   ["MiniAOD_New", "MiniAOD_Validating", "MiniAOD_Validated",
-                    "MiniAOD_Defined", "MiniAOD_Approved", "MiniAOD_Submitted",
-                    "MiniAOD_Done"],
-                   ["MiniAODv2_New", "MiniAODv2_Validating",
-                    "MiniAODv2_Validated", "MiniAODv2_Defined",
-                    "MiniAODv2_Approved", "MiniAODv2_Submitted",
-                    "MiniAODv2_Done"]]
-    campaigns = ["RunIIWinter15*LHE", "RunIISummer15GS", "RunIIFall15DR76",
-                 "RunIIFall15MiniAODv1", "RunIIFall15MiniAODv2"]
     campaign_classes = ["lhe", "gs", "dr", "miniaod", "miniaodv2"]
 
     fout.write("""\
@@ -77,30 +62,41 @@ def makeAnalyzerHTML():
     <th class="gs">GS</th>
     <th class="dr">DR</th>
     <th class="miniaod">MiniAODv1</th>
-    <th class="miniaodv2">MiniAODv2</th>
 </tr>
 """)
 
     conn = sqlite3.connect(mcmscripts_config.database_location)
 
     c = conn.cursor()
-    c.execute('SELECT Process, Tag, RequestMultiplicity, LHE_Done, GS_Done, DR_Done, MiniAOD_Done, MiniAODv2_Done, RequesterID FROM RequestSets;')
-    out = c.fetchall()
-
-    for request in out:
-        c.execute('SELECT Name, Email FROM Requesters WHERE RequesterID = {0};'.format(
-                request[8]))
-        requester = c.fetchall()
-        fout.write("""\
+    c.execute("""SELECT SetID, Process, Tag, Events, RequestMultiplicity, Notes,
+Spreadsheet FROM RequestSets;""")
+    request_sets = c.fetchall()
+    for request_set in request_sets:
+        c.execute("""SELECT InstanceID, DisplayName, Requesters.Name,
+Requesters.Email, CampaignChains.Name FROM Instances INNER JOIN Contacts
+USING(ContactID) INNER JOIN Requesters USING(RequesterID)
+INNER JOIN CampaignChains USING(CampaignChainID) WHERE SetID = {0};""".format(request_set[0]))
+        instances = c.fetchall()
+        for instance in instances:
+            c.execute("""SELECT Campaigns.Name, New, Validating, Validated,
+Defined, Approved, Submitted, Done FROM Requests INNER JOIN Instance_Requests
+USING(RequestsID) INNER JOIN Campaigns USING(CampaignID)
+WHERE InstanceID = {0} ORDER BY Level""".format(instance[0]))
+            requests = c.fetchall()
+            fout.write("""\
 <tr>
     <td class="process">{0}</td>
     <td class="requester"><a href="mailto:{1}">{2}</a></td>
-""".format(request[0], requester[0][1], requester[0][0]))
-        for i in range(len(status_name)):
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4} done</a></td>\n".format(
-                    campaign_classes[i], request[1], campaigns[i], request[3 + i], request[2]))
+""".format(request_set[1], instance[3], instance[2]))
+            class_offset = 0
+            if len(requests) < 4:
+                fout.write("    <td class=\"lhe\">&nbsp;</td>\n")
+                class_offset = 1
+            for i in range(len(requests)):
+                fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
+                        campaign_classes[i + class_offset], request_set[2],
+                        requests[i][0], requests[i][7], request_set[4]))
         fout.write("</tr>\n")
-    conn.close()
 
     fout.write("""\
 </table>
@@ -119,21 +115,6 @@ def makeAnalyzerHTML():
 
 def makeContactHTML():
     fout = open('{0}contact.html'.format(mcmscripts_config.html_location), 'w')
-    status_name = [["LHE_New", "LHE_Validating", "LHE_Validated", "LHE_Defined",
-                    "LHE_Approved", "LHE_Submitted", "LHE_Done"],
-                   ["GS_New", "GS_Validating", "GS_Validated", "GS_Defined",
-                    "GS_Approved", "GS_Submitted", "GS_Done"],
-                   ["DR_New", "DR_Validating", "DR_Validated", "DR_Defined",
-                    "DR_Approved", "DR_Submitted", "DR_Done"],
-                   ["MiniAOD_New", "MiniAOD_Validating", "MiniAOD_Validated",
-                    "MiniAOD_Defined", "MiniAOD_Approved", "MiniAOD_Submitted",
-                    "MiniAOD_Done"],
-                   ["MiniAODv2_New", "MiniAODv2_Validating",
-                    "MiniAODv2_Validated", "MiniAODv2_Defined",
-                    "MiniAODv2_Approved", "MiniAODv2_Submitted",
-                    "MiniAODv2_Done"]]
-    campaigns = ["RunIIWinter15*LHE", "RunIISummer15GS", "RunIIFall15DR76",
-                 "RunIIFall15MiniAODv1", "RunIIFall15MiniAODv2"]
     campaign_classes = ["lhe", "gs", "dr", "miniaod", "miniaodv2"]
 
     fout.write("""\
@@ -169,7 +150,7 @@ def makeContactHTML():
     <th class="gs">GS</th>
     <th class="dr">DR</th>
     <th class="miniaod">MiniAODv1</th>
-    <th class="miniaodv2">MiniAODv2</th>
+    <!--<th class="miniaodv2">MiniAODv2</th>-->
     <th class="spreadsheet">Spreadsheet</th>
     <th class="notes">Notes</th>
 </tr>
@@ -178,46 +159,48 @@ def makeContactHTML():
     conn = sqlite3.connect(mcmscripts_config.database_location)
 
     c = conn.cursor()
-    c.execute("""SELECT Process, RequesterID, ContactID, Tag, Events, Notes, Spreadsheet, RequestMultiplicity,
-                 LHE_New, LHE_Validating, LHE_Validated, LHE_Defined, LHE_Approved, LHE_Submitted, LHE_Done,
-                 GS_New, GS_Validating, GS_Validated, GS_Defined, GS_Approved, GS_Submitted, GS_Done,
-                 DR_New, DR_Validating, DR_Validated, DR_Defined, DR_Approved, DR_Submitted, DR_Done,
-                 MiniAOD_New, MiniAOD_Validating, MiniAOD_Validated, MiniAOD_Defined, MiniAOD_Approved, MiniAOD_Submitted, MiniAOD_Done,
-                 MiniAODv2_New, MiniAODv2_Validating, MiniAODv2_Validated, MiniAODv2_Defined, MiniAODv2_Approved, MiniAODv2_Submitted, MiniAODv2_Done
-                 FROM RequestSets;""")
-    out = c.fetchall()
-
-    for request in out:
-        c.execute('SELECT Name, Email FROM Requesters WHERE RequesterID = {0};'.format(
-                request[1]))
-        requester = c.fetchall()
-        c.execute('SELECT DisplayName, Email FROM Contacts WHERE ContactID = {0};'.format(
-                request[2]))
-        contact = c.fetchall()
-        fout.write("""\
+    c.execute("""SELECT SetID, Process, Tag, Events, RequestMultiplicity, Notes,
+Spreadsheet FROM RequestSets;""")
+    request_sets = c.fetchall()
+    for request_set in request_sets:
+        c.execute("""SELECT InstanceID, DisplayName, Requesters.Name,
+Requesters.Email, CampaignChains.Name FROM Instances INNER JOIN Contacts
+USING(ContactID) INNER JOIN Requesters USING(RequesterID)
+INNER JOIN CampaignChains USING(CampaignChainID) WHERE SetID = {0};""".format(request_set[0]))
+        instances = c.fetchall()
+        for instance in instances:
+            c.execute("""SELECT Campaigns.Name, New, Validating, Validated,
+Defined, Approved, Submitted, Done FROM Requests INNER JOIN Instance_Requests
+USING(RequestsID) INNER JOIN Campaigns USING(CampaignID)
+WHERE InstanceID = {0} ORDER BY Level""".format(instance[0]))
+            requests = c.fetchall()
+            fout.write("""\
 <tr>
     <td class="process">{0}</td>
     <td class="tag">{1}</td>
     <td class="requester"><a href="mailto:{2}">{3}</a></td>
     <td class="contact">{4}</td>
     <td class="events">{5}</td>
-""".format(request[0], request[3], requester[0][1], requester[0][0], contact[0][0],
-           display_number(request[4])))
-        for i in range(len(status_name)):
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a></td>\n".format(
-                    campaign_classes[i], request[3], campaigns[i],
-                    request[8 + i*7], request[9 + i*7], request[10 + i*7],
-                    request[11 + i*7], request[12 + i*7], request[13 + i*7],
-                    request[14 + i*7], request[7]))
-        if request[6] == "":
-            fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
-        else:
-            fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\">X</a></td>".format(
-                    request[6]))
-        fout.write("""\
+""".format(request_set[1], request_set[2], instance[3], instance[2],
+           instance[1], display_number(request_set[3])))
+            class_offset = 0
+            if len(requests) < 4:
+                fout.write("    <td class=\"lhe\">&nbsp;</td>\n")
+                class_offset = 1
+            for i in range(len(requests)):
+                fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a></td>\n".format(
+                        campaign_classes[i + class_offset], request_set[2],
+                        requests[i][0], requests[i][1], requests[i][2],
+                        requests[i][3], requests[i][4], requests[i][5],
+                        requests[i][6], requests[i][7], request_set[4]))
+            if request_set[6] == "":
+                fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
+            else:
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\">X</a></td>".format(
+                        request_set[6]))
+            fout.write("""\
     <td class="notes">{0}</td>
-</tr>\n""".format(request[5]))
-    conn.close()
+</tr>\n""".format(request_set[5]))
 
     fout.write("""\
 </table>

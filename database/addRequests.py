@@ -46,6 +46,7 @@ WHERE SuperCampaignID = {0};""".format(super_campaign))
             print "{0} {1}".format(row[0], row[1])
         campaign_chain = raw_input("Chain: ")
         conn.close()
+        contact_id = raw_input("Contact: ")
 
         yn = raw_input("Are these acceptable? [y/n] ")
         while True:
@@ -58,7 +59,7 @@ WHERE SuperCampaignID = {0};""".format(super_campaign))
                 yn = raw_input('Please enter "yes" or "no". ')
 
     return [process, requester, email, tag, events, multiplicity, note,
-            spreadsheet, ticket, super_campaign, campaign_chain]
+            spreadsheet, ticket, super_campaign, campaign_chain, contact_id]
 
 
 def AddRequester(name_, email_):
@@ -107,7 +108,7 @@ RequestMultiplicity, Notes, Spreadsheet, Ticket) VALUES ("{0}", "{1}", {2}, {3},
     set_id = c.lastrowid
     c.execute("""INSERT INTO Instances (SetID, CampaignChainID, ContactID,
 RequesterID, PriorityBlock) VALUES ({0}, {1}, {2}, {3}, {4});""".format(
-            set_id, answers_[10], 1, requester_id_, 3))
+            set_id, answers_[10], answers_[11], requester_id_, 3))
     instance_id = c.lastrowid
     c.execute("""SELECT Campaigns.CampaignID FROM CampaignChains
 INNER JOIN CampaignChain_Campaign USING(CampaignChainID)
