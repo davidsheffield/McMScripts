@@ -114,8 +114,13 @@ rect.done, path.done {
     stroke-width: 0;
 }
 
-rect.unknown, path.unknown {
+rect.absent, path.absent {
     fill: #727272;
+    stroke-width: 0;
+}
+
+rect.extra, path.extra {
+    fill: #cc0000;
     stroke-width: 0;
 }
 

@@ -64,21 +64,26 @@ ORDER BY Level""".format(instance[0]))
                 <g class="bar">
 """.format(request_set[2], requests[i][0]))
             statuses = ["new", "validating", "validated", "defined", "approved",
-                        "submitted", "done", "unkown"]
+                        "submitted", "done", "absent", "extra"]
+            sum_known = requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4] + requests[i][5] + requests[i][6] + requests[i][7]
+            total = max(request_set[4], sum_known)
             x_pos = 0.0
             tmp_object_counter = object_counter
             for j in range(7):
                 bar_width = 0.0
-                if request_set[4] != 0:
-                    bar_width = float(requests[i][j+1])/float(request_set[4])*100.0
+                if total != 0:
+                    bar_width = float(requests[i][j+1])/float(total)*100.0
                 fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
 """.format(x_pos, bar_width, statuses[j], tmp_object_counter))
                 x_pos += bar_width
                 tmp_object_counter += 1
+            unkown_reason = "absent"
+            if total > request_set[4]:
+                unkown_reason = "extra"
             fout.write("""\
-                    <rect x="{0}" y="18" width="{1}" height="30" class="unknown" onmouseover="show(evt, 'object{2}')" onmouseout="hide(evt, 'object{2}')" />
-""".format(x_pos, 100.0 - x_pos, tmp_object_counter))
+                    <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
+""".format(x_pos, 100.0 - x_pos, unkown_reason, tmp_object_counter))
             fout.write("""\
                 </g>
             </a>
@@ -86,7 +91,6 @@ ORDER BY Level""".format(instance[0]))
             for j in range(7):
                 fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <!--<rect x="0" y="0" width="100.0" height="18" class="{1}" />-->
                 <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
                 <text x="10" y="15">{2} {1}</text>
             </g>
@@ -94,26 +98,72 @@ ORDER BY Level""".format(instance[0]))
                 object_counter += 1
             fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <!--<rect x="0" y="0" width="100.0" height="18" class="unknown" />-->
-                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="unknown" />
-                <text x="10" y="15">{1} unkown</text>
+                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
+                <text x="10" y="15">{2} {1}</text>
             </g>
-""".format(object_counter, 0))
+""".format(object_counter, unkown_reason, total - sum_known))
             object_counter += 1
             fout.write("""\
         </svg>
 """)
             fout.write("    </td>\n")
         elif page == 1:
-            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
-            #         campaign_classes[i + class_offset], request_set[2],
-            #         requests[i][0], requests[i][7], request_set[4]))
             fout.write("    <td class=\"{0}\">\n".format(campaign_classes[i + class_offset]))
-            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=274877909023\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6}&amp;chd=t:{2}|0|0|0|{3}|{4}|{5}|0\" alt=\"{2} {3} {4} {5} / {6}\" title=\"{1} {2} preparation, {3} approved, {4} running, {5} done / {6}\"></a>\n".format(
-                    request_set[2], requests[i][0],
-                    requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4],
-                    requests[i][5], requests[i][6], requests[i][7],
-                    request_set[4]))
+            fout.write("""\
+        <svg width="100" height="48" class="status">
+            <a xlink:href="https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1" target="_blank">
+                <g class="bar">
+""".format(request_set[2], requests[i][0]))
+            statuses = ["new", "validating", "validated", "defined", "approved",
+                        "submitted", "done", "absent", "extra"]
+            sum_known = requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4] + requests[i][5] + requests[i][6] + requests[i][7]
+            total = max(request_set[4], sum_known)
+            combined_statuses = ["preparation", "ready to run", "running",
+                                 "done", "absent", "extra"]
+            combined_classes = [statuses[0], statuses[4], statuses[5], statuses[6]]
+            combined_requests = [requests[i][1] + requests[i][2] + requests[i][3],
+                                 requests[i][4] + requests[i][5], requests[i][6],
+                                 requests[i][7]]
+            x_pos = 0.0
+            tmp_object_counter = object_counter
+            for j in range(4):
+                bar_width = 0.0
+                if total != 0:
+                    bar_width = float(combined_requests[j])/float(total)*100.0
+                fout.write("""\
+                    <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
+""".format(x_pos, bar_width, combined_classes[j], tmp_object_counter))
+                x_pos += bar_width
+                tmp_object_counter += 1
+            unkown_reason = "absent"
+            if total > request_set[4]:
+                unkown_reason = "extra"
+            fout.write("""\
+                    <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
+""".format(x_pos, 100.0 - x_pos, unkown_reason, tmp_object_counter))
+            fout.write("""\
+                </g>
+            </a>
+""")
+            for j in range(4):
+                fout.write("""\
+            <g id="object{0}" display="none" class="tooltip">
+                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
+                <text x="10" y="15">{2} {3}</text>
+            </g>
+""".format(object_counter, combined_classes[j], combined_requests[j],
+           combined_statuses[j]))
+                object_counter += 1
+            fout.write("""\
+            <g id="object{0}" display="none" class="tooltip">
+                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
+                <text x="10" y="15">{2} {1}</text>
+            </g>
+""".format(object_counter, unkown_reason, total - sum_known))
+            object_counter += 1
+            fout.write("""\
+        </svg>
+""")
             fout.write("    </td>\n")
     return
 
@@ -257,6 +307,24 @@ def makeAnalyzerHTML():
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+    <svg width="0" height="0">
+        <script>
+            <![CDATA[
+            function show(evt, node) {
+                var svgdoc = evt.target.ownerDocument;
+                var obj = svgdoc.getElementById(node);
+                obj.setAttribute("display", "inline");
+            }
+
+            function hide(evt, node) {
+                var svgdoc = evt.target.ownerDocument;
+                var obj = svgdoc.getElementById(node);
+                obj.setAttribute("display" , "none");
+            }
+            ]]>
+        </script>
+    </svg>
 </head>
 
 <body>
