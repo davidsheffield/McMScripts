@@ -53,11 +53,22 @@ ORDER BY Level""".format(instance[0]))
     for i in range(len(requests)):
         if page == 0:
             #ccccff,cc99ff,727272,98fb98,ff6666,ffc570,66aa66,ff4500
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\">".format(
-                    campaign_classes[i + class_offset], request_set[2],
-                    requests[i][0], requests[i][1], requests[i][2],
-                    requests[i][3], requests[i][4], requests[i][5],
-                    requests[i][6], requests[i][7], request_set[4]))
+            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\" alt=\"{3} {4} {5} {6} {7} {8} {9} / {10}\" title=\"{3} {4} {5} {6} {7} {8} {9} / {10}\">".format(
+            #         campaign_classes[i + class_offset], request_set[2],
+            #         requests[i][0], requests[i][1], requests[i][2],
+            #         requests[i][3], requests[i][4], requests[i][5],
+            #         requests[i][6], requests[i][7], request_set[4]))
+            fout.write("    <td class=\"{0}\">\n".format(campaign_classes[i + class_offset]))
+            # fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1\" class=\"status\">{2}<br>{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}/{9}</a>\n".format(
+            #         request_set[2], requests[i][0], requests[i][1],
+            #         requests[i][2], requests[i][3], requests[i][4],
+            #         requests[i][5], requests[i][6], requests[i][7],
+            #         request_set[4]))
+            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{9},0,{9},0,{9},0,{9},0,{9},0,{9},0,{9},0,{9}&amp;chd=t:{2}|{3}|{4}|{5}|{6}|{7}|{8}|0\" alt=\"{2} {3} {4} {5} {6} {7} {8} / {9}\" title=\"{2} {3} {4} {5} {6} {7} {8} / {9}\"></a>\n".format(
+                    request_set[2], requests[i][0], requests[i][1],
+                    requests[i][2], requests[i][3], requests[i][4],
+                    requests[i][5], requests[i][6], requests[i][7],
+                    request_set[4]))
             #<img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=130x26&amp;cht=bhs:nda&amp;chco=ffc570,ccccff,727272,cc99ff,66aa66,ff6666,98FB98,FF4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\">
             # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br>".format(
 #                     campaign_classes[i + class_offset], request_set[2],
@@ -100,11 +111,18 @@ ORDER BY Level""".format(instance[0]))
 #            requests[i][4], requests[i][5], requests[i][6], requests[i][7],
 #            abs(requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4] + requests[i][5] + requests[i][6] + requests[i][7] - request_set[4]),
 #            request_set[2], requests[i][0]))
-            fout.write("</td>\n")
+            fout.write("    </td>\n")
         elif page == 1:
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
-                    campaign_classes[i + class_offset], request_set[2],
-                    requests[i][0], requests[i][7], request_set[4]))
+            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
+            #         campaign_classes[i + class_offset], request_set[2],
+            #         requests[i][0], requests[i][7], request_set[4]))
+            fout.write("    <td class=\"{0}\">\n".format(campaign_classes[i + class_offset]))
+            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=274877909023\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6}&amp;chd=t:{2}|0|0|0|{3}|{4}|{5}|0\" alt=\"{2} {3} {4} {5} / {6}\" title=\"{2} preparation, {3} approved, {4} running, {5} done / {6}\"></a>\n".format(
+                    request_set[2], requests[i][0],
+                    requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4],
+                    requests[i][5], requests[i][6], requests[i][7],
+                    request_set[4]))
+            fout.write("    </td>\n")
     return
 
 
@@ -143,7 +161,17 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\">X</a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"table.gif\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
+                        request_set[6]))
+            if request_set[5] == "":
+                fout.write("    <td class=\"notes\">&nbsp;</td>\n")
+            else:
+                fout.write("    <td class=\"notes\">{0}</td>\n".format(request_set[5]))
+        elif page == 1:
+            if request_set[6] == "":
+                fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
+            else:
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"table.gif\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
@@ -195,7 +223,7 @@ ORDER BY Active;""")
     <th class="lhe">LHE</th>
     <th class="gs">GS</th>
     <th class="dr">DR</th>
-    <th class="miniaod">MiniAODv1</th>
+    <th class="miniaod">MiniAOD</th>
     <th class="spreadsheet">Spreadsheet</th>
     <th class="notes">Notes</th>
 """)
@@ -206,7 +234,9 @@ ORDER BY Active;""")
     <th class="lhe">LHE</th>
     <th class="gs">GS</th>
     <th class="dr">DR</th>
-    <th class="miniaod">MiniAODv1</th>
+    <th class="miniaod">MiniAOD</th>
+    <th class="spreadsheet">Spreadsheet</th>
+    <th class="notes">Notes</th>
 """)
         fout.write("</tr>\n")
 
@@ -239,6 +269,13 @@ def makeAnalyzerHTML():
 
 <div class="wrapper">
 <h1>Exotica MC</h1>
+
+<table><tr>
+    <td class="gs" style="background-color:#ccccff">Preparing requests</td>
+    <td class="gs" style="background-color:#ffeba4">Approved to run</td>
+    <td class="gs" style="background-color:#ffc570">Running</td>
+    <td class="gs" style="background-color:#66aa66">Done</td>
+</tr></table>
 
 """)
 
@@ -290,16 +327,15 @@ def makeContactHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<table style="margin:1em;border:1px black solid;"><tbody>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">1</td><td class="gs" style="background-color:#ccccff">new</td></tr>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">2</td><td class="gs" style="background-color:#cc99ff">validating</td></tr>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">3</td><td class="gs" style="background-color:#6BA6E8">validated</td></tr>
-    <tr style="background-color:#ffffff"><td>Key:</td><td class="gs" style="width:3em">4</td><td class="gs" style="background-color:#52FBC4">defined</td></tr>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">5</td><td class="gs" style="background-color:#FFEBA4">approved</td></tr>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">6</td><td class="gs" style="background-color:#ffc570">submitted</td></tr>
-    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">7/28</td><td class="gs" style="background-color:#66aa66">done/total</td></tr>
-</tr>
-</tbody></table>
+<table><tr>
+    <td class="gs" style="background-color:#ccccff">New</td>
+    <td class="gs" style="background-color:#cc99ff">Validating</td>
+    <td class="gs" style="background-color:#6ba6e8">Validated</td>
+    <td class="gs" style="background-color:#52fbc4">Defined</td>
+    <td class="gs" style="background-color:#ffeba4">Approved</td>
+    <td class="gs" style="background-color:#ffc570">Submitted</td>
+    <td class="gs" style="background-color:#66aa66">Done</td>
+</tr></table>
 
 """)
 
