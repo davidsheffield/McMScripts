@@ -122,3 +122,13 @@ rect.unknown, path.unknown {
 g.tooltip text {
     font-size: 13px;
 }
+
+div.spreadsheet_icon {
+    width: 32px;
+    height: 32px;
+    background: url(sprites.png) -5px -5px;
+}
+
+td.spreadsheet a:hover {
+    text-decoration: none;
+}

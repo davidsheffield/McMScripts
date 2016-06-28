@@ -153,7 +153,7 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"sprite.png\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><div class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
@@ -163,7 +163,7 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"sprite.png\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><div class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
@@ -384,7 +384,7 @@ WHERE SettingID = 1""")
 def syncAuxiliaryFiles():
     shutil.copyfile("global.css", "{0}global.css".format(mcmscripts_config.html_location))
     shutil.copyfile("favicon.ico", "{0}favicon.ico".format(mcmscripts_config.html_location))
-    shutil.copyfile("sprite.png", "{0}sprite.png".format(mcmscripts_config.html_location))
+    shutil.copyfile("sprites.png", "{0}sprites.png".format(mcmscripts_config.html_location))
 
     print "Copied auxiliary files"
 
