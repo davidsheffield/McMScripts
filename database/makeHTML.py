@@ -52,11 +52,55 @@ ORDER BY Level""".format(instance[0]))
         class_offset = 1
     for i in range(len(requests)):
         if page == 0:
-            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a></td>\n".format(
+            #ccccff,cc99ff,727272,98fb98,ff6666,ffc570,66aa66,ff4500
+            fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\">".format(
                     campaign_classes[i + class_offset], request_set[2],
                     requests[i][0], requests[i][1], requests[i][2],
                     requests[i][3], requests[i][4], requests[i][5],
                     requests[i][6], requests[i][7], request_set[4]))
+            #<img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=130x26&amp;cht=bhs:nda&amp;chco=ffc570,ccccff,727272,cc99ff,66aa66,ff6666,98FB98,FF4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\">
+            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br>".format(
+#                     campaign_classes[i + class_offset], request_set[2],
+#                     requests[i][0], requests[i][1], requests[i][2],
+#                     requests[i][3], requests[i][4], requests[i][5],
+#                     requests[i][6], requests[i][7], request_set[4]))
+#             chart_name = "{0}{1}".format(request_set[2], requests[i][0]).replace("-", "")
+
+#             fout.write("""\
+#          <script type="text/javascript">
+#              google.charts.setOnLoadCallback(draw{0});
+#              function draw{0}() {{
+#              var data = google.visualization.arrayToDataTable([
+#                  ['Campaign', 'New', 'Validating', 'Validated', 'Defined', 'Approved', 'Submitted', 'Done', 'Unkown'],
+#                  ['', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}],
+#              ]);
+#              var options = {{
+#                  isStacked: 'percent',
+#                  height: 100,
+#                  width: 150,
+#                  legend: {{
+#                      position: 'none'
+#                  }},
+#                  hAxis: {{
+#                      gridlines: {{count: 0}}
+#                  }},
+#                  vAxis:{{
+#                      baselineColor: '#fff',
+#                      gridlineColor: '#fff',
+#                      textPosition: 'none'
+#                  }},
+#                  colors:['#ccccff', '#cc99ff', '#727272', '#98FB98', '#ff6666', '#ffc570', '#66aa66', '#FF4500']
+#              }};
+#              var chart = new google.visualization.BarChart(document.getElementById('chart_span_{0}'));
+#              chart.draw(data, options);
+#          }}
+#     </script>
+#     <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={9}&member_of_campaign={10}&page=-1\" class=\"status\" target="_blank"><span id="chart_span_{0}" style="width: 150px; height: 100px; background-color:#00ff00;"></span></a>
+# """.format(chart_name, requests[i][1], requests[i][2], requests[i][3],
+#            requests[i][4], requests[i][5], requests[i][6], requests[i][7],
+#            abs(requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4] + requests[i][5] + requests[i][6] + requests[i][7] - request_set[4]),
+#            request_set[2], requests[i][0]))
+            fout.write("</td>\n")
         elif page == 1:
             fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
                     campaign_classes[i + class_offset], request_set[2],
@@ -246,9 +290,23 @@ def makeContactHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<table style="margin:1em;border:1px black solid;"><tbody><tr style="background-color:#ffffff"><td>Key:</td><td class="gs" style="width:3em">1<br>2<br>3<br>4<br>5<br>6<br>7/28</td><td class="gs">new<br>validating<br>validated<br>defined<br>approved<br>submitted<br>done/total</td></tr></tbody></table>
+<table style="margin:1em;border:1px black solid;"><tbody>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">1</td><td class="gs" style="background-color:#ccccff">new</td></tr>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">2</td><td class="gs" style="background-color:#cc99ff">validating</td></tr>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">3</td><td class="gs" style="background-color:#6BA6E8">validated</td></tr>
+    <tr style="background-color:#ffffff"><td>Key:</td><td class="gs" style="width:3em">4</td><td class="gs" style="background-color:#52FBC4">defined</td></tr>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">5</td><td class="gs" style="background-color:#FFEBA4">approved</td></tr>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">6</td><td class="gs" style="background-color:#ffc570">submitted</td></tr>
+    <tr style="background-color:#ffffff"><td>&nbsp;</td><td class="gs" style="width:3em">7/28</td><td class="gs" style="background-color:#66aa66">done/total</td></tr>
+</tr>
+</tbody></table>
 
 """)
+
+    # <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    # <script type="text/javascript">
+    #     google.charts.load('current', {packages: ['corechart', 'bar']});
+    # </script>
 
     conn = sqlite3.connect(mcmscripts_config.database_location)
 
