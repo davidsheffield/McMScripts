@@ -11,6 +11,7 @@ body {
     margin: 0;
     border: 0;
     font-family: Helvetica, Ariel, sans-serif;
+    font-size: 12pt;
 }
 
 div.wrapper {
@@ -48,15 +49,15 @@ th {
 }
 
 td {
-    padding: 2px;
+    padding: 8px 2px 8px 2px;
 }
 
 th.lhe, th.gs, th.dr, th.miniaod, th.miniaodv2 {
-    width: 125px;
+    min-width: 100px;
 }
 
 td.lhe, td.gs, td.dr, td.miniaod, td.miniaodv2 {
-    text-align: center;
+    /*text-align: center;*/
 }
 
 p.update-time {
@@ -70,6 +71,54 @@ img {
 }
 
 img.spreadsheet_icon {
-    width: 16px;
-    height: 16px;
+    width: 21px;
+    height: 21px;
+}
+
+svg.status {
+    margin-top: -18px;
+}
+
+rect.new, path.new {
+    fill: #ccccff;
+    stroke-width: 0;
+}
+
+rect.validating, path.validating {
+    fill: #cc99ff;
+    stroke-width: 0;
+}
+
+rect.validated, path.validated {
+    fill: #6ba6e8;
+    stroke-width: 0;
+}
+
+rect.defined, path.defined {
+    fill: #52fbc4;
+    stroke-width: 0;
+}
+
+rect.approved, path.approved {
+    fill: #ffeba4;
+    stroke-width: 0;
+}
+
+rect.submitted, path.submitted {
+    fill: #ffc570;
+    stroke-width: 0;
+}
+
+rect.done, path.done {
+    fill: #66aa66;
+    stroke-width: 0;
+}
+
+rect.unknown, path.unknown {
+    fill: #727272;
+    stroke-width: 0;
+}
+
+g.tooltip text {
+    font-size: 13px;
 }

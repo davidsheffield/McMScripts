@@ -14,8 +14,12 @@ import sqlite3
 import argparse
 import sys
 import math
+import shutil
 sys.path.append('../')
 import mcmscripts_config
+
+# Global variables
+object_counter = 0
 
 
 def display_number(n):
@@ -30,6 +34,7 @@ def display_number(n):
 
 def writeRequests(page, fout, c, super_campaign, request_set, instance):
     campaign_classes = ["lhe", "gs", "dr", "miniaod"]
+    global object_counter
 
     c.execute("""\
 SELECT Campaigns.Name,
@@ -52,72 +57,59 @@ ORDER BY Level""".format(instance[0]))
         class_offset = 1
     for i in range(len(requests)):
         if page == 0:
-            #ccccff,cc99ff,727272,98fb98,ff6666,ffc570,66aa66,ff4500
-            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\" alt=\"{3} {4} {5} {6} {7} {8} {9} / {10}\" title=\"{3} {4} {5} {6} {7} {8} {9} / {10}\">".format(
-            #         campaign_classes[i + class_offset], request_set[2],
-            #         requests[i][0], requests[i][1], requests[i][2],
-            #         requests[i][3], requests[i][4], requests[i][5],
-            #         requests[i][6], requests[i][7], request_set[4]))
             fout.write("    <td class=\"{0}\">\n".format(campaign_classes[i + class_offset]))
-            # fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1\" class=\"status\">{2}<br>{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}/{9}</a>\n".format(
-            #         request_set[2], requests[i][0], requests[i][1],
-            #         requests[i][2], requests[i][3], requests[i][4],
-            #         requests[i][5], requests[i][6], requests[i][7],
-            #         request_set[4]))
-            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{9},0,{9},0,{9},0,{9},0,{9},0,{9},0,{9},0,{9}&amp;chd=t:{2}|{3}|{4}|{5}|{6}|{7}|{8}|0\" alt=\"{2} {3} {4} {5} {6} {7} {8} / {9}\" title=\"{2} {3} {4} {5} {6} {7} {8} / {9}\"></a>\n".format(
-                    request_set[2], requests[i][0], requests[i][1],
-                    requests[i][2], requests[i][3], requests[i][4],
-                    requests[i][5], requests[i][6], requests[i][7],
-                    request_set[4]))
-            #<img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=130x26&amp;cht=bhs:nda&amp;chco=ffc570,ccccff,727272,cc99ff,66aa66,ff6666,98FB98,FF4500&amp;chds=0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10},0,{10}&amp;chd=t:{3}|{4}|{5}|{6}|{7}|{8}|{9}|0\">
-            # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}<br>{4}<br>{5}<br>{6}<br>{7}<br>{8}<br>{9}/{10}</a><br>".format(
-#                     campaign_classes[i + class_offset], request_set[2],
-#                     requests[i][0], requests[i][1], requests[i][2],
-#                     requests[i][3], requests[i][4], requests[i][5],
-#                     requests[i][6], requests[i][7], request_set[4]))
-#             chart_name = "{0}{1}".format(request_set[2], requests[i][0]).replace("-", "")
-
-#             fout.write("""\
-#          <script type="text/javascript">
-#              google.charts.setOnLoadCallback(draw{0});
-#              function draw{0}() {{
-#              var data = google.visualization.arrayToDataTable([
-#                  ['Campaign', 'New', 'Validating', 'Validated', 'Defined', 'Approved', 'Submitted', 'Done', 'Unkown'],
-#                  ['', {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}],
-#              ]);
-#              var options = {{
-#                  isStacked: 'percent',
-#                  height: 100,
-#                  width: 150,
-#                  legend: {{
-#                      position: 'none'
-#                  }},
-#                  hAxis: {{
-#                      gridlines: {{count: 0}}
-#                  }},
-#                  vAxis:{{
-#                      baselineColor: '#fff',
-#                      gridlineColor: '#fff',
-#                      textPosition: 'none'
-#                  }},
-#                  colors:['#ccccff', '#cc99ff', '#727272', '#98FB98', '#ff6666', '#ffc570', '#66aa66', '#FF4500']
-#              }};
-#              var chart = new google.visualization.BarChart(document.getElementById('chart_span_{0}'));
-#              chart.draw(data, options);
-#          }}
-#     </script>
-#     <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={9}&member_of_campaign={10}&page=-1\" class=\"status\" target="_blank"><span id="chart_span_{0}" style="width: 150px; height: 100px; background-color:#00ff00;"></span></a>
-# """.format(chart_name, requests[i][1], requests[i][2], requests[i][3],
-#            requests[i][4], requests[i][5], requests[i][6], requests[i][7],
-#            abs(requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4] + requests[i][5] + requests[i][6] + requests[i][7] - request_set[4]),
-#            request_set[2], requests[i][0]))
+            fout.write("""\
+        <svg width="100" height="48" class="status">
+            <a xlink:href="https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1" target="_blank">
+                <g class="bar">
+""".format(request_set[2], requests[i][0]))
+            statuses = ["new", "validating", "validated", "defined", "approved",
+                        "submitted", "done", "unkown"]
+            x_pos = 0.0
+            tmp_object_counter = object_counter
+            for j in range(7):
+                bar_width = 0.0
+                if request_set[4] != 0:
+                    bar_width = float(requests[i][j+1])/float(request_set[4])*100.0
+                fout.write("""\
+                    <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
+""".format(x_pos, bar_width, statuses[j], tmp_object_counter))
+                x_pos += bar_width
+                tmp_object_counter += 1
+            fout.write("""\
+                    <rect x="{0}" y="18" width="{1}" height="30" class="unknown" onmouseover="show(evt, 'object{2}')" onmouseout="hide(evt, 'object{2}')" />
+""".format(x_pos, 100.0 - x_pos, tmp_object_counter))
+            fout.write("""\
+                </g>
+            </a>
+""")
+            for j in range(7):
+                fout.write("""\
+            <g id="object{0}" display="none" class="tooltip">
+                <!--<rect x="0" y="0" width="100.0" height="18" class="{1}" />-->
+                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
+                <text x="10" y="15">{2} {1}</text>
+            </g>
+""".format(object_counter, statuses[j], requests[i][j+1]))
+                object_counter += 1
+            fout.write("""\
+            <g id="object{0}" display="none" class="tooltip">
+                <!--<rect x="0" y="0" width="100.0" height="18" class="unknown" />-->
+                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="unknown" />
+                <text x="10" y="15">{1} unkown</text>
+            </g>
+""".format(object_counter, 0))
+            object_counter += 1
+            fout.write("""\
+        </svg>
+""")
             fout.write("    </td>\n")
         elif page == 1:
             # fout.write("    <td class=\"{0}\"><a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={1}&member_of_campaign={2}&page=-1\" class=\"status\">{3}/{4}</a></td>\n".format(
             #         campaign_classes[i + class_offset], request_set[2],
             #         requests[i][0], requests[i][7], request_set[4]))
             fout.write("    <td class=\"{0}\">\n".format(campaign_classes[i + class_offset]))
-            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=274877909023\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6}&amp;chd=t:{2}|0|0|0|{3}|{4}|{5}|0\" alt=\"{2} {3} {4} {5} / {6}\" title=\"{2} preparation, {3} approved, {4} running, {5} done / {6}\"></a>\n".format(
+            fout.write("        <a href=\"https://cms-pdmv.cern.ch/mcm/requests?tags={0}&member_of_campaign={1}&page=-1&shown=274877909023\" class=\"status\" target=\"_blank\"><img src=\"http://chart.apis.google.com/chart?chbh=a,0&amp;chs=100x30&amp;cht=bhs:nda&amp;chco=ccccff,cc99ff,6ba6e8,52fbc4,ffeba4,ffc570,66aa66,ff4500&amp;chds=0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6},0,{6}&amp;chd=t:{2}|0|0|0|{3}|{4}|{5}|0\" alt=\"{2} {3} {4} {5} / {6}\" title=\"{1} {2} preparation, {3} approved, {4} running, {5} done / {6}\"></a>\n".format(
                     request_set[2], requests[i][0],
                     requests[i][1] + requests[i][2] + requests[i][3] + requests[i][4],
                     requests[i][5], requests[i][6], requests[i][7],
@@ -161,7 +153,7 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"table.gif\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"sprite.png\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
@@ -171,7 +163,7 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"table.gif\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\"><img src=\"sprite.png\" alt=\"X\" class=\"spreadsheet_icon\"></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
@@ -201,6 +193,8 @@ WHERE SuperCampaignID = {0};""".format(super_campaign[0]))
 
 
 def writeSuperCampaigns(page, fout, c):
+    global object_counter
+    object_counter = 0
     c.execute("""\
 SELECT SuperCampaignID,
        Name
@@ -320,6 +314,24 @@ def makeContactHTML():
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+
+    <svg width="0" height="0">
+        <script>
+            <![CDATA[
+            function show(evt, node) {
+                var svgdoc = evt.target.ownerDocument;
+                var obj = svgdoc.getElementById(node);
+                obj.setAttribute("display", "inline");
+            }
+
+            function hide(evt, node) {
+                var svgdoc = evt.target.ownerDocument;
+                var obj = svgdoc.getElementById(node);
+                obj.setAttribute("display" , "none");
+            }
+            ]]>
+        </script>
+    </svg>
 </head>
 
 <body>
@@ -369,9 +381,20 @@ WHERE SettingID = 1""")
     return
 
 
+def syncAuxiliaryFiles():
+    shutil.copyfile("global.css", "{0}global.css".format(mcmscripts_config.html_location))
+    shutil.copyfile("favicon.ico", "{0}favicon.ico".format(mcmscripts_config.html_location))
+    shutil.copyfile("sprite.png", "{0}sprite.png".format(mcmscripts_config.html_location))
+
+    print "Copied auxiliary files"
+
+    return
+
+
 def main():
     makeAnalyzerHTML()
     makeContactHTML()
+    syncAuxiliaryFiles()
 
     return
 
