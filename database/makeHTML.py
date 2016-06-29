@@ -73,6 +73,8 @@ ORDER BY Level""".format(instance[0]))
                 bar_width = 0.0
                 if total != 0:
                     bar_width = float(requests[i][j+1])/float(total)*100.0
+                    if bar_width < 0.0:
+                        bar_width = 0.0
                 fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
 """.format(x_pos, bar_width, statuses[j], tmp_object_counter))
@@ -83,7 +85,7 @@ ORDER BY Level""".format(instance[0]))
                 unkown_reason = "extra"
             fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
-""".format(x_pos, 100.0 - x_pos, unkown_reason, tmp_object_counter))
+""".format(x_pos, max(100.0 - x_pos, 0.0), unkown_reason, tmp_object_counter))
             fout.write("""\
                 </g>
             </a>
@@ -91,15 +93,15 @@ ORDER BY Level""".format(instance[0]))
             for j in range(7):
                 fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
-                <text x="10" y="15">{2} {1}</text>
+                <path d="M0 18 V7 Q0 0 7 0 H93 Q100 0 100 7 V18" class="{1}" />
+                <text x="10" y="14">{2} {1}</text>
             </g>
 """.format(object_counter, statuses[j], requests[i][j+1]))
                 object_counter += 1
             fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
-                <text x="10" y="15">{2} {1}</text>
+                <path d="M0 18 V7 Q0 0 7 0 H93 Q100 0 100 7 V18" class="{1}" />
+                <text x="10" y="14">{2} {1}</text>
             </g>
 """.format(object_counter, unkown_reason, total - sum_known))
             object_counter += 1
@@ -130,6 +132,8 @@ ORDER BY Level""".format(instance[0]))
                 bar_width = 0.0
                 if total != 0:
                     bar_width = float(combined_requests[j])/float(total)*100.0
+                    if bar_width < 0.0:
+                        bar_width = 0.0
                 fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
 """.format(x_pos, bar_width, combined_classes[j], tmp_object_counter))
@@ -140,7 +144,7 @@ ORDER BY Level""".format(instance[0]))
                 unkown_reason = "extra"
             fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
-""".format(x_pos, 100.0 - x_pos, unkown_reason, tmp_object_counter))
+""".format(x_pos, max(100.0 - x_pos, 0.0), unkown_reason, tmp_object_counter))
             fout.write("""\
                 </g>
             </a>
@@ -148,16 +152,16 @@ ORDER BY Level""".format(instance[0]))
             for j in range(4):
                 fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
-                <text x="10" y="15">{2} {3}</text>
+                <path d="M0 18 V7 Q0 0 7 0 H93 Q100 0 100 7 V18" class="{1}" />
+                <text x="10" y="14">{2} {3}</text>
             </g>
 """.format(object_counter, combined_classes[j], combined_requests[j],
            combined_statuses[j]))
                 object_counter += 1
             fout.write("""\
             <g id="object{0}" display="none" class="tooltip">
-                <path d="M0 18 V10 Q0 0 10 0 H90 Q100 0 100 10 V18" class="{1}" />
-                <text x="10" y="15">{2} {1}</text>
+                <path d="M0 18 V7 Q0 0 7 0 H93 Q100 0 100 7 V18" class="{1}" />
+                <text x="10" y="14">{2} {1}</text>
             </g>
 """.format(object_counter, unkown_reason, total - sum_known))
             object_counter += 1
@@ -203,22 +207,22 @@ WHERE SetID = {0}
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><div class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><span class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"notes\">{0}</td>\n".format(request_set[5]))
+                fout.write("    <td class=\"notes\"><span class=\"ref\"><span class=\"note_icon\">&nbsp;</span><span class=\"note_content\">{0}</span></span></td>\n".format(request_set[5]))
         elif page == 1:
             if request_set[6] == "":
                 fout.write("    <td class=\"spreadsheet empty\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><div class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
+                fout.write("    <td class=\"spreadsheet\"><a href=\"{0}\" target=\"_blank\" title=\"spreadsheet\"><span class=\"spreadsheet_icon\">&nbsp;</div></a></td>\n".format(
                         request_set[6]))
             if request_set[5] == "":
                 fout.write("    <td class=\"notes\">&nbsp;</td>\n")
             else:
-                fout.write("    <td class=\"notes\">{0}</td>\n".format(request_set[5]))
+                fout.write("    <td class=\"notes\"><span class=\"ref\"><span class=\"note_icon\">&nbsp;</span><span class=\"note_content\">{0}</span></span></td>\n".format(request_set[5]))
         fout.write("</tr>\n")
     return
 
@@ -325,6 +329,18 @@ def makeAnalyzerHTML():
             ]]>
         </script>
     </svg>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script>
+      jQuery.noConflict();
+      jQuery(function() {
+        jQuery(".note_content").hide();
+        jQuery(".note_icon").click(function(event) {
+          jQuery(this.nextSibling).toggle();
+          event.stopPropagation();
+        });
+      });
+    </script>
 </head>
 
 <body>
@@ -332,12 +348,12 @@ def makeAnalyzerHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<table><tr>
+<!--<table><tr>
     <td class="gs" style="background-color:#ccccff">Preparing requests</td>
     <td class="gs" style="background-color:#ffeba4">Approved to run</td>
     <td class="gs" style="background-color:#ffc570">Running</td>
     <td class="gs" style="background-color:#66aa66">Done</td>
-</tr></table>
+</tr></table>-->
 
 """)
 
@@ -400,6 +416,22 @@ def makeContactHTML():
             ]]>
         </script>
     </svg>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script>
+      jQuery.noConflict();
+      jQuery(function() {
+        jQuery(".note_content").hide();
+        jQuery(".note_icon").click(function(event) {
+          jQuery(this.nextSibling).toggle();
+          //jQuery(this).toggle(jQuery(this).css("background", "url(sprites.png) -48px -6px"), jQuery(this).css("background", "url(sprites.png) -6px -89px"));
+          event.stopPropagation();
+        });
+        //jQuery("body").click(function(event) {
+        //  jQuery(".note_content").hide();
+        //});
+      });
+    </script>
 </head>
 
 <body>
@@ -407,7 +439,7 @@ def makeContactHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<table><tr>
+<!--<table><tr>
     <td class="gs" style="background-color:#ccccff">New</td>
     <td class="gs" style="background-color:#cc99ff">Validating</td>
     <td class="gs" style="background-color:#6ba6e8">Validated</td>
@@ -415,7 +447,9 @@ def makeContactHTML():
     <td class="gs" style="background-color:#ffeba4">Approved</td>
     <td class="gs" style="background-color:#ffc570">Submitted</td>
     <td class="gs" style="background-color:#66aa66">Done</td>
-</tr></table>
+</tr></table>-->
+
+<p><a href="analyzer.html">Go to analyzer page</a></p>
 
 """)
 

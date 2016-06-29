@@ -6,7 +6,7 @@
 *************************/
 
 body {
-    background-color: #ffffff;
+    background-color: #fbfbfb;
     padding: 0;
     margin: 0;
     border: 0;
@@ -57,7 +57,7 @@ th.lhe, th.gs, th.dr, th.miniaod, th.miniaodv2 {
 }
 
 td.lhe, td.gs, td.dr, td.miniaod, td.miniaodv2 {
-    /*text-align: center;*/
+    text-align: center;
 }
 
 p.update-time {
@@ -128,10 +128,42 @@ g.tooltip text {
     font-size: 13px;
 }
 
-div.spreadsheet_icon {
-    width: 32px;
-    height: 32px;
-    background: url(sprites.png) -5px -5px;
+span.spreadsheet_icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    background: url(sprites.png) -6px -6px;
+    margin: auto;
+}
+
+span.spreadsheet_icon:hover {
+    background: url(sprites.png) -48px -6px;
+}
+
+span.note_icon {
+    display:block;
+    width: 30px;
+    height: 30px;
+    background: url(sprites.png) -6px -48px;
+    margin: auto;
+}
+
+span.note_icon:hover {
+    background: url(sprites.png) -48px -48px;
+}
+
+span.note_content {
+    display: none;
+    background-color: #f2f2ee;
+    border: 1px solid;
+    border-color: #000000;
+    position: absolute;
+    padding: 7px;
+    -moz-transform: translateX(-100%) translateY(-15px);
+    -ms-transform: translateX(-100%) translateY(-15px);
+    -webkit-transform: translateX(-100%) translateY(-15px);
+    -o-transform: translateX(-100%) translateY(-15px);
+    transform: translateX(-100%) translateY(-15px);
 }
 
 td.spreadsheet a:hover {
