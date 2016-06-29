@@ -255,12 +255,28 @@ SELECT SuperCampaignID,
 FROM SuperCampaigns
 ORDER BY Active;""")
     super_campaigns = c.fetchall()
+    fout.write("""\
+<div class="toc">
+    <h2>Campaigns:</h2>
+    <ul>
+""")
     for super_campaign in super_campaigns:
         fout.write("""\
-<h2 class="campaign">{0}</h2>
+        <li><a href="#{0}">{1}</a></li>
+""".format(super_campaign[1].replace(" ", "-"), super_campaign[1]))
+    fout.write("""\
+    </ul>
+</div>
+
+""")
+
+    for super_campaign in super_campaigns:
+        fout.write("""\
+<h2 class="campaign" id="{0}">{1}</h2>
 <table>
+<thead>
 <tr class="table_header">
-""".format(super_campaign[1]))
+""".format(super_campaign[1].replace(" ", "-"), super_campaign[1]))
         if page == 0:
             fout.write("""\
     <th class="process">Process</th>
@@ -286,11 +302,11 @@ ORDER BY Active;""")
     <th class="spreadsheet">Spreadsheet</th>
     <th class="notes">Notes</th>
 """)
-        fout.write("</tr>\n")
+        fout.write("</tr>\n</thead>\n<tbody>\n")
 
         writeRequestSets(page, fout, c, super_campaign)
 
-        fout.write("</table>\n")
+        fout.write("</tbody>\n</table>\n")
 
     return
 
@@ -348,13 +364,6 @@ def makeAnalyzerHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<!--<table><tr>
-    <td class="gs" style="background-color:#ccccff">Preparing requests</td>
-    <td class="gs" style="background-color:#ffeba4">Approved to run</td>
-    <td class="gs" style="background-color:#ffc570">Running</td>
-    <td class="gs" style="background-color:#66aa66">Done</td>
-</tr></table>-->
-
 """)
 
     conn = sqlite3.connect(mcmscripts_config.database_location)
@@ -369,7 +378,7 @@ WHERE SettingID = 1""")
     check_time = c.fetchone()
     fout.write("""\
 </table>
-<p class="update-time">Updated {0}</p>
+<div class="update-time">Updated {0}</p>
 </div>
 
 </body>
@@ -439,16 +448,6 @@ def makeContactHTML():
 <div class="wrapper">
 <h1>Exotica MC</h1>
 
-<!--<table><tr>
-    <td class="gs" style="background-color:#ccccff">New</td>
-    <td class="gs" style="background-color:#cc99ff">Validating</td>
-    <td class="gs" style="background-color:#6ba6e8">Validated</td>
-    <td class="gs" style="background-color:#52fbc4">Defined</td>
-    <td class="gs" style="background-color:#ffeba4">Approved</td>
-    <td class="gs" style="background-color:#ffc570">Submitted</td>
-    <td class="gs" style="background-color:#66aa66">Done</td>
-</tr></table>-->
-
 <p><a href="analyzer.html">Go to analyzer page</a></p>
 
 """)
@@ -470,7 +469,7 @@ WHERE SettingID = 1""")
     check_time = c.fetchone()
     fout.write("""\
 </table>
-<p class="update-time">Updated {0}</p>
+<div class="update-time">Updated {0}</p>
 </div>
 
 </body>

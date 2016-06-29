@@ -5,6 +5,12 @@
 **
 *************************/
 
+/****************
+**
+** Page
+**
+****************/
+
 body {
     background-color: #fbfbfb;
     padding: 0;
@@ -18,62 +24,114 @@ div.wrapper {
     margin: 20px 50px 20px 50px;
 }
 
-a {
+/****************
+**
+** Text
+**
+****************/
+
+a, a:visited {
     text-decoration: none;
+    color: #0000dd;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover, a:visited:hover {
+    color: #dd0000;
 }
+
+h1 {
+    font-size: 32pt;
+    color: #000000;
+}
+
+h2 {
+    font-size: 24pt;
+    background-color: #84a4aa;
+    color: #000000;
+    padding: 6pt;
+    margin-top: 24pt;
+}
+
+div.toc h2 {
+    font-size: 18pt;
+    background-color: #fbfbfb;
+    color: #000000;
+    padding: 0px;
+    margin-bottom: 10pt;
+    margin-top: 0px;
+}
+
+li {
+    margin: 10pt 0pt 10pt 0pt;
+}
+
+div.update-time {
+    color: #999999;
+    font-size: 10pt;
+    font-style: italic;
+    margin: 15pt 0 15pt 0;
+}
+
+/****************
+**
+** Table
+**
+****************/
 
 table {
     border-collapse: collapse;
 }
 
-tr:nth-child(even) {
+tbody tr:nth-child(odd) {
     background: #ffffff;
 }
 
-tr:nth-child(odd) {
+tbody tr:nth-child(even) {
     background: #dddddd;
 }
 
-tr.table_header {
-    background-color: #999999;
+thead {
     border-bottom: 2px solid black;
-    text-color: #ffffff;
+}
+
+thead tr {
+    background-color: #c0bcb9;
+    color: #000000;
 }
 
 th {
-    padding: 2px;
+    padding: 8pt 2pt 6pt 2pt;
 }
 
 td {
-    padding: 8px 2px 8px 2px;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 th.lhe, th.gs, th.dr, th.miniaod, th.miniaodv2 {
     min-width: 100px;
 }
 
+th.notes {
+    padding-right: 5pt;
+}
+
 td.lhe, td.gs, td.dr, td.miniaod, td.miniaodv2 {
     text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
-p.update-time {
-    color: #999999;
-    font-size: 0.8em;
-    font-style: italic;
+td.process, td.tag, td.requester, td.contact, td.events {
+    padding-left: 5pt;
+    padding-right: 5pt;
 }
 
-img {
-    border: 0px;
-}
-
-img.spreadsheet_icon {
-    width: 21px;
-    height: 21px;
-}
+/****************
+**
+** Bar charts
+**
+****************/
 
 svg.status {
     margin-top: -18px;
@@ -128,6 +186,12 @@ g.tooltip text {
     font-size: 13px;
 }
 
+/****************
+**
+** Sprites
+**
+****************/
+
 span.spreadsheet_icon {
     display: block;
     width: 30px;
@@ -164,8 +228,4 @@ span.note_content {
     -webkit-transform: translateX(-100%) translateY(-15px);
     -o-transform: translateX(-100%) translateY(-15px);
     transform: translateX(-100%) translateY(-15px);
-}
-
-td.spreadsheet a:hover {
-    text-decoration: none;
 }
