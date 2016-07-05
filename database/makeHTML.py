@@ -72,7 +72,10 @@ ORDER BY Level""".format(instance[0]))
             for j in range(7):
                 bar_width = 0.0
                 if total != 0:
-                    bar_width = float(requests[i][j+1])/float(total)*100.0
+                    if requests[i][j+1] <= request_set[4]:
+                        bar_width = float(requests[i][j+1])/float(total)*100.0
+                    else:
+                        bar_width = float(request_set[4])/float(total)*100.0
                     if bar_width < 0.0:
                         bar_width = 0.0
                 fout.write("""\
@@ -83,6 +86,8 @@ ORDER BY Level""".format(instance[0]))
             unkown_reason = "absent"
             if total > request_set[4]:
                 unkown_reason = "extra"
+                # if x_pos >= 95.0:
+                #     x_pos = 95.0
             fout.write("""\
                     <rect x="{0}" y="18" width="{1}" height="30" class="{2}" onmouseover="show(evt, 'object{3}')" onmouseout="hide(evt, 'object{3}')" />
 """.format(x_pos, max(100.0 - x_pos, 0.0), unkown_reason, tmp_object_counter))
@@ -103,7 +108,7 @@ ORDER BY Level""".format(instance[0]))
                 <path d="M0 18 V7 Q0 0 7 0 H93 Q100 0 100 7 V18" class="{1}" />
                 <text x="10" y="14">{2} {1}</text>
             </g>
-""".format(object_counter, unkown_reason, total - sum_known))
+""".format(object_counter, unkown_reason, max(total - sum_known, sum_known - request_set[4])))
             object_counter += 1
             fout.write("""\
         </svg>
@@ -195,8 +200,9 @@ WHERE SetID = {0}
     <td class="requester"><a href="mailto:{2}">{3}</a></td>
     <td class="contact">{4}</td>
     <td class="events">{5}</td>
+    <td class="requests">{6}</td>
 """.format(request_set[1], request_set[2], instance[3], instance[2],
-           instance[1], display_number(request_set[3])))
+           instance[1], display_number(request_set[3]), request_set[4]))
         elif page == 1:
             fout.write("""\
     <td class="process">{0}</td>
@@ -284,6 +290,7 @@ ORDER BY Active;""")
     <th class="requester">Requester</th>
     <th class="contact">Contact</th>
     <th class="events">Events</th>
+    <th class="requests">Requests</th>
     <th class="lhe">LHE</th>
     <th class="gs">GS</th>
     <th class="dr">DR</th>
